@@ -19,6 +19,12 @@ public static class FlagsmithBuilderExtensions
     public static FlagsmithBuilder UseEntityFramework(this FlagsmithBuilder builder, Action<EntityFrameworkFlagsmithBuilder>? options = null)
     {
         builder.Services.AddScoped<IFeatureStore, EntityFrameworkFeatureStore>();
+
+        if (!builder.HasCustomTenantStore)
+        {
+            builder.Services.AddScoped<ITenantStore, EntityFrameworkTenantStore>();
+        }
+        
         builder.Services.AddHostedService<DatabaseInitializer>();
 
         options?.Invoke(new EntityFrameworkFlagsmithBuilder(builder.Services));

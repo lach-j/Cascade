@@ -8,16 +8,18 @@ public interface IFeatureToggleService
     Task<IEnumerable<string>> GetAvailableFeatureIds();
 
 
-    Task UpdateFeatureAsync(string featureKey, bool enabled, long tenantId = default);
+    Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default);
 
     Task<IEnumerable<Tenant>> GetAllTenantsAsync();
 
-    Task<bool> IsEnabledAsync(string featureKey, long tenantId = default);
+    Task<bool> IsEnabledAsync(string featureKey, string? tenantId = default);
+
+    Task ToggleOverride(string featureKey, string tenantId);
 }
 
 public class TenantState
 {
-    public long TenantId { get; set; }
+    public string TenantId { get; set; }
     public bool IsEnabled { get; set; }
     public bool Override { get; set; }
 }
@@ -34,12 +36,13 @@ public class FeatureFlag
 
 public class Tenant
 {
-    public long Id { get; set; }
+    public string Id { get; set; }
     public string Name { get; set; }
+    public string? Url { get; set; }
 }
 
 public class TenantOverride
 {
-    public Tenant Tenant { get; set; }
+    public string TenantId { get; set; }
     public bool Enabled { get; set; }
 }

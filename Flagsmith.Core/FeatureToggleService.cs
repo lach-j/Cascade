@@ -4,11 +4,13 @@ public class FeatureToggleService : IFeatureToggleService
 {
     private readonly IFeatureStore _featureStore;
     private readonly IFeatureIdProvider _idProvider;
+    private readonly ITenantStore _tenantStore;
 
-    public FeatureToggleService(IFeatureStore featureStore, IFeatureIdProvider idProvider)
+    public FeatureToggleService(IFeatureStore featureStore, IFeatureIdProvider idProvider, ITenantStore tenantStore)
     {
         _featureStore = featureStore;
         _idProvider = idProvider;
+        _tenantStore = tenantStore;
     }
 
     public async Task<IEnumerable<FeatureFlag>> GetAllFeaturesAsync()
@@ -21,10 +23,10 @@ public class FeatureToggleService : IFeatureToggleService
         var feature = await _featureStore.GetFeature(featureId);
         if (feature is null) return [];
         
-        var tenants = await _featureStore.GetAllTenantsAsync();
+        var tenants = await _tenantStore.GetAllTenantsAsync();
         var overrides = await _featureStore.GetFeatureTenantOverridesAsync(featureId);
 
-        var overridesHash = overrides.ToDictionary(x => x.Tenant.Id);
+        var overridesHash = overrides.ToDictionary(x => x.TenantId);
         return tenants.Select(
             x => new TenantState()
             {
@@ -45,19 +47,37 @@ public class FeatureToggleService : IFeatureToggleService
         return _idProvider.GetFeatureIds().Where(x => !existingFeatures.Contains(x));
     }
 
-    public async Task UpdateFeatureAsync(string featureKey, bool enabled, long tenantId = default)
+    public async Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default)
     {
         await _featureStore.UpdateFeatureAsync(featureKey, enabled, tenantId);
     }
 
     public async Task<IEnumerable<Tenant>> GetAllTenantsAsync()
     {
-        return await _featureStore.GetAllTenantsAsync();
+        return await _tenantStore.GetAllTenantsAsync();
     }
 
-    public async Task<bool> IsEnabledAsync(string featureKey, long tenantId = default)
+    public async Task<bool> IsEnabledAsync(string featureKey, string tenantId = default)
     {
         var flag = await _featureStore.GetFeature(featureKey);
         return flag?.IsEnabled ?? false;
+    }
+
+    public async Task ToggleOverride(string featureKey, string tenantId)
+    {
+        var feature = await _featureStore.GetFeature(featureKey);
+        if (feature is null) return;
+
+        var overrides = await _featureStore.GetFeatureTenantOverridesAsync(featureKey);
+        var hasOverride = overrides.Any(x => x.TenantId == tenantId);
+
+        if (hasOverride)
+        {
+            await _featureStore.DeleteFeatureTenantOverrideAsync(featureKey, tenantId);
+        }
+        else
+        {
+            await _featureStore.AddFeatureTenantOverrideAsync(featureKey, tenantId, feature.IsEnabled);
+        }
     }
 }

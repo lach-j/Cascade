@@ -20,6 +20,8 @@ public class FlagsmithDbContext : DbContext
             entity.ToTable("Features");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.UpdatedAt).HasConversion(x => x, updated => updated.ToKindUtc());
+            entity.Property(e => e.CreatedAt).HasConversion(x => x, created => created.ToKindUtc());
         });
 
         modelBuilder.Entity<TenantOverrideEntity>(entity =>

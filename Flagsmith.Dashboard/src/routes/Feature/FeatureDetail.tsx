@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  LuCircleCheck,
-  LuCircleAlert,
-  LuInfo,
-  LuEllipsisVertical,
-  LuLoaderCircle,
-  LuCircleDashed,
-} from "react-icons/lu";
+import { LuCircleAlert, LuInfo, LuEllipsisVertical } from "react-icons/lu";
 import { Alert } from "../../components";
 import {
   Card,
@@ -22,85 +15,70 @@ import Navbar from "../../components/Navbar";
 import SearchBar from "../../components/SearchBar";
 import Code from "../../components/Code";
 import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
+import ToggleButton from "../../components/ToggleButton";
 
 export type FeatureFlag = {
   id: string;
   name: string;
   description: string;
   isEnabled: boolean;
-  conditions?: { type: string; value: string | number }[];
-  stats?: {
-    enabledTenants: number;
-    totalTenants: number;
-  };
+  updatedAt: string;
 };
 
 export type Tenant = {
-  id: number;
+  id: string;
   name: string;
+  url?: string;
 };
 
 export type TenantState = {
-  tenantId: number;
+  tenantId: string;
   isEnabled: boolean;
   override: boolean;
 };
 
 const FeatureDetail = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isFilteringOverrides, setIsFilteringOverrides] = React.useState(false);
   const { featureId } = useParams();
   const navigate = useNavigate();
-  const { availableTenants, availableFeatures, updateFeatureState } =
-    useFeatureContext();
-
-  const filteredTenants = availableTenants.filter((tenant) =>
-    tenant.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const {
+    availableTenants,
+    availableFeatures,
+    updateFeatureState,
+    toggleOverride,
+  } = useFeatureContext();
 
   const foundFeature = availableFeatures.find(
     (f) => f.feature.id === featureId
+  );
+
+  const filteredTenants = availableTenants.filter(
+    (tenant) =>
+      (tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !isFilteringOverrides) ||
+      foundFeature?.tenantStates.find((t) => t.tenantId === tenant.id)?.override
   );
 
   const tableCols: ColumnDefinition<Tenant>[] = React.useMemo(
     () => [
       {
         Cell: ({ item }) => {
-          const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
           const tenantState = foundFeature?.tenantStates.find(
             (t) => t.tenantId === item.id
           );
 
           return (
-            <button
-              disabled={isLoading}
-              className={`flex items-center gap-2 px-2 py-2 rounded-lg ${
-                tenantState?.isEnabled
-                  ? "bg-green-100 text-green-700 hover:bg-green-200"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-              onClick={async () => {
-                setIsLoading(true);
+            <ToggleButton
+              action={async () =>
                 await updateFeatureState(
                   featureId ?? "",
                   !tenantState?.isEnabled,
                   item.id
-                );
-                setIsLoading(false);
-              }}
-            >
-              {isLoading ? (
-                <LuLoaderCircle className="w-5 h-5 animate-spin" />
-              ) : tenantState?.isEnabled ? (
-                <>
-                  <LuCircleCheck className="w-5 h-5" />
-                </>
-              ) : (
-                <>
-                  <LuCircleDashed className="w-5 h-5" />
-                </>
-              )}
-            </button>
+                )
+              }
+              isEnabled={tenantState?.isEnabled}
+            />
           );
         },
         shrink: true,
@@ -148,7 +126,7 @@ const FeatureDetail = () => {
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={() => {
-                      console.log("Delete tenant");
+                      toggleOverride(item.id, foundFeature?.feature.id ?? "");
                     }}
                   >
                     {foundFeature?.tenantStates.find(
@@ -165,7 +143,7 @@ const FeatureDetail = () => {
         shrink: true,
       },
     ],
-    [featureId, foundFeature, navigate, updateFeatureState]
+    [featureId, foundFeature, navigate, toggleOverride, updateFeatureState]
   );
 
   if (!foundFeature) return <p>Loading...</p>;
@@ -177,27 +155,34 @@ const FeatureDetail = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Navbar />
-          <div className="flex justify-between items-start mb-6">
-            <div>
+          <div className="flex gap-5 items-start mb-6">
+            <ToggleButton
+              size="xl"
+              action={async () =>
+                await updateFeatureState(
+                  selectedFlag.id,
+                  !selectedFlag.isEnabled
+                )
+              }
+              isEnabled={selectedFlag.isEnabled}
+            />
+            <div className="w-full">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {selectedFlag.name}
                 </h1>
                 <Code>{selectedFlag.id}</Code>
               </div>
-              <p className="text-gray-600">{selectedFlag.description}</p>
+              <div className="flex justify-between text-gray-600">
+                <p>{selectedFlag.description}</p>
+                <span>
+                  Last updated:{" "}
+                  {new Date(selectedFlag.updatedAt).toLocaleDateString()}{" "}
+                  {new Date(selectedFlag.updatedAt).toLocaleTimeString()}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-3 py-1 rounded-lg text-sm ${
-                  selectedFlag.isEnabled
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {selectedFlag.isEnabled ? "Enabled" : "Disabled"}
-              </span>
-            </div>
+            <div className="flex items-center gap-2"></div>
           </div>
 
           <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>
@@ -219,6 +204,16 @@ const FeatureDetail = () => {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="pl-2 pt-2">
+              <label>
+                <input
+                  className="mr-3"
+                  type="checkbox"
+                  onChange={(x) => setIsFilteringOverrides(x.target.checked)}
+                />
+                Show Only Overriden Tenants
+              </label>
+            </div>
             <DynamicTable items={filteredTenants} columns={tableCols} />
           </CardContent>
         </Card>

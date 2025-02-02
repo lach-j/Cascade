@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Flagsmith.EntityFramework.SqlServer.Migrations
 {
     [DbContext(typeof(FlagsmithDbContext))]
-    [Migration("20250201032115_InitialCreate")]
+    [Migration("20250201231612_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -74,8 +74,8 @@ namespace Flagsmith.EntityFramework.SqlServer.Migrations
                     b.Property<string>("FeatureId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("TenantId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -83,12 +83,15 @@ namespace Flagsmith.EntityFramework.SqlServer.Migrations
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("TenantEntityId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("FeatureId", "TenantId");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantEntityId");
 
                     b.ToTable("TenantOverrides", (string)null);
                 });
@@ -101,15 +104,11 @@ namespace Flagsmith.EntityFramework.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Flagsmith.EntityFramework.Models.TenantEntity", "Tenant")
+                    b.HasOne("Flagsmith.EntityFramework.Models.TenantEntity", null)
                         .WithMany("FeatureOverrides")
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TenantEntityId");
 
                     b.Navigation("Feature");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Flagsmith.EntityFramework.Models.FeatureFlagEntity", b =>

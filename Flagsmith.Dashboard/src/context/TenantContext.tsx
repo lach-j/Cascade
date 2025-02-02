@@ -17,11 +17,9 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
 
   const { data: availableIds } = useFetch<string[]>("api/available-ids");
 
-  console.log(availableIds);
-
   const toggleFeature = useDirectFetch<
     void,
-    { featureId: string; enabled: boolean; tenantId?: number }
+    { featureId: string; enabled: boolean; tenantId?: string }
   >(
     ({ featureId, enabled, tenantId }) =>
       `api/feature-flags/${featureId}?enabled=${enabled}${
@@ -32,6 +30,17 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
     }
   );
 
+  const toggleOverride = useDirectFetch<
+    void,
+    { featureId: string; tenantId: string }
+  >(
+    ({ featureId, tenantId }) =>
+      `api/tenants/${tenantId}/overrides/${featureId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
   return (
     <FeatureContext.Provider
       value={{
@@ -39,6 +48,10 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
         availableFeatures: features || [],
         updateFeatureState: async (featureId, enabled, tenantId) => {
           await toggleFeature({ featureId, enabled, tenantId });
+          await refetchFeatures();
+        },
+        toggleOverride: async (tenantId, featureId) => {
+          await toggleOverride({ featureId, tenantId });
           await refetchFeatures();
         },
         availableIds: availableIds || [],

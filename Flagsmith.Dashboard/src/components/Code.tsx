@@ -10,19 +10,17 @@ const Code = ({ children }: { children: string }) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <code className="bg-gray-800 text-orange-300 px-2 py-0.5 rounded font-mono text-sm">
-        {children}
-      </code>
+    <div className="flex items-center bg-gray-800 text-orange-300 rounded">
+      <code className="pl-2 py-0.5 font-mono text-sm">{children}</code>
       <button
         onClick={() => handleCopy(children)}
-        className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+        className="p-1.5 rounded transition-colors group"
         aria-label="Copy code"
       >
         {copied ? (
           <LuCheck className="w-4 h-4 text-green-500" />
         ) : (
-          <LuCopy className="w-4 h-4 text-gray-500" />
+          <LuCopy className="w-4 h-4 text-gray-500 group-hover:text-gray-400" />
         )}
       </button>
     </div>

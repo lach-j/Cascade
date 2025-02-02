@@ -8,7 +8,7 @@ public class EntityFrameworkFeatureStore : IFeatureStore
 {
     private readonly FlagsmithDbContext _context;
 
-    public EntityFrameworkFeatureStore(FlagsmithDbContext context, IFeatureIdProvider featureIdProvider)
+    public EntityFrameworkFeatureStore(FlagsmithDbContext context)
     {
         _context = context;
     }
@@ -19,25 +19,49 @@ public class EntityFrameworkFeatureStore : IFeatureStore
             .Include(f => f.TenantOverrides)
             .ToListAsync();
 
-        return features.Select(MapToFeatureFlag);
-    }
-
-    public async Task<IEnumerable<Tenant>> GetAllTenantsAsync()
-    {
-        var tenants = await _context.Tenants
-            .Include(t => t.FeatureOverrides)
-            .ToListAsync();
-
-        return tenants.Select(MapToTenant);
+        return features.Select(x => x.MapToFeatureFlag());
     }
     
     public async Task<IEnumerable<TenantOverride>> GetFeatureTenantOverridesAsync(string featureId)
     {
         var overrides = _context.TenantOverrides.Where(x => x.FeatureId == featureId);
-        return (await overrides.ToListAsync()).Select(MapToTenantOverride);
+        return (await overrides.ToListAsync()).Select(x => x.MapToTenantOverride());
     }
 
-    public async Task UpdateFeatureAsync(string featureKey, bool enabled, long tenantId = default)
+    public async Task DeleteFeatureTenantOverrideAsync(string featureId, string tenantId)
+    {
+        var overrideToDelete = await _context.TenantOverrides.FirstOrDefaultAsync(to => to.FeatureId == featureId && to.TenantId == tenantId);
+        if (overrideToDelete is null) return;
+        _context.TenantOverrides.Remove(overrideToDelete);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddFeatureTenantOverrideAsync(string featureId, string tenantId, bool enabled)
+    {
+        var existingOverride = await _context.TenantOverrides.FirstOrDefaultAsync(to => to.FeatureId == featureId && to.TenantId == tenantId);
+        if (existingOverride is not null)
+        {
+            existingOverride.IsEnabled = enabled;
+            existingOverride.UpdatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            _context.TenantOverrides.Add(
+                new TenantOverrideEntity()
+                {
+                    FeatureId = featureId,
+                    TenantId = tenantId,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsEnabled = enabled,
+                });
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default)
     {
         if (tenantId != default)
         {
@@ -70,39 +94,10 @@ public class EntityFrameworkFeatureStore : IFeatureStore
 
         await _context.SaveChangesAsync();
     }
-
-    private static FeatureFlag? MapToFeatureFlag(FeatureFlagEntity entity)
-    {
-        return new FeatureFlag
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-            Description = entity.Description,
-            IsEnabled = entity.IsEnabled,
-        };
-    }
-
-    private static Tenant MapToTenant(TenantEntity entity)
-    {
-        return new Tenant
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-        };
-    }
-    
-    private static TenantOverride MapToTenantOverride(TenantOverrideEntity entity)
-    {
-        return new TenantOverride()
-        {
-            Enabled = entity.IsEnabled,
-            Tenant = MapToTenant(entity.Tenant),
-        };
-    }
     
     public async Task<FeatureFlag?> GetFeature(string featureKey)
     {
         var entity = await _context.Features.FirstOrDefaultAsync(f => f.Id == featureKey);
-        return entity is null ? default : MapToFeatureFlag(entity);
+        return entity is null ? default : entity.MapToFeatureFlag();
     }
 }

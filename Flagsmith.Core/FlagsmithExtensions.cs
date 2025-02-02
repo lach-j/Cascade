@@ -80,7 +80,7 @@ public static class FlagsmithExtensions
                             
                             api.MapPatch(
                                 "/feature-flags/{featureId}",
-                                async (string featureId, [FromQuery(Name = "tenantId")] long tenantId, [FromQuery(Name = "enabled")] bool enabled, IFeatureToggleService service) =>
+                                async (string featureId, [FromQuery(Name = "tenantId")] string? tenantId, [FromQuery(Name = "enabled")] bool enabled, IFeatureToggleService service) =>
                                 {
                                     await service.UpdateFeatureAsync(featureId, enabled, tenantId);
                                 });
@@ -89,6 +89,10 @@ public static class FlagsmithExtensions
                             api.MapGet(
                                 "/tenants",
                                 async (IFeatureToggleService service) => await service.GetAllTenantsAsync());
+                            
+                            api.MapDelete(
+                                "/tenants/{tenantId}/overrides/{featureId}",
+                                async (string tenantId, string featureId, IFeatureToggleService service) => await service.ToggleOverride(featureId, tenantId));
 
                             api.MapFallback(() => Results.NotFound());
                     });
@@ -115,6 +119,7 @@ public class FlagsmithBuilder
 {
     public readonly IServiceCollection Services;
     public bool FeatureIdProviderConfigured { get; private set; }
+    public bool HasCustomTenantStore { get; private set; }
 
     public FlagsmithBuilder(IServiceCollection services)
     {
@@ -133,6 +138,22 @@ public class FlagsmithBuilder
         }
 
         FeatureIdProviderConfigured = true;
+
+        return this;
+    }
+    
+    public FlagsmithBuilder RegisterCustomTenantStore<T>(Func<IServiceProvider, T>? implementation) where T : class, ITenantStore
+    {
+        if (implementation != default)
+        {
+            Services.AddScoped<ITenantStore>(implementation);
+        }
+        else
+        {
+            Services.AddScoped<ITenantStore, T>();
+        }
+
+        HasCustomTenantStore = true;
 
         return this;
     }

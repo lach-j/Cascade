@@ -117,7 +117,7 @@ const FeatureFlagDashboard = () => {
               features in Flagsmith
             </p>
           </div>
-          <div className="flex gap-5">
+          <div className="flex gap-5 flex-wrap">
             {availableIds.map((id) => (
               <Code>{id}</Code>
             ))}

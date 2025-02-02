@@ -6,10 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/Card";
-import { LuChartBar, LuSearch, LuSettings } from "react-icons/lu";
+import { LuChartBar, LuSearch } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useFeatureContext } from "../../context/useTenants";
 import NavTabs, { NavTab } from "../../components/Tabs";
+import OrganisationIcon from "../../components/OrganisationIcon";
 
 const TenantDashboard = () => {
   const navigate = useNavigate();
@@ -78,12 +79,12 @@ const TenantDashboard = () => {
                       </CardTitle>
                       <CardDescription>ID: {tenant.id}</CardDescription>
                     </div>
-                    <button
-                      title="Open Settings"
-                      className="p-2 rounded-full bg-gray-100"
-                    >
-                      <LuSettings className="w-6 h-6 text-gray-600" />
-                    </button>
+                    <div className="p-2 rounded-full bg-gray-100">
+                      <OrganisationIcon
+                        className="w-6 h-6 text-gray-600"
+                        text={tenant.name}
+                      />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import FeatureFlagDashboard from "./routes/Feature/Dashboard.tsx";
 import FeatureDetail from "./routes/Feature/FeatureDetail.tsx";
 import TenantDetail from "./routes/Tenant/TenantDetail.tsx";
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
             <Route index element={<TenantDashboard />} />
             <Route path=":tenantId" element={<TenantDetail />} />
           </Route>
-          <Route path="*" element={<FeatureFlagDashboard />} />
+          <Route path="*" element={<Navigate to="/features" />} />
         </Route>
       </Routes>
     </BrowserRouter>

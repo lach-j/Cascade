@@ -10,6 +10,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddFlagsmith(
     configure =>
     {
+        configure.RegisterCustomTenantStore<ExampleTenantProvider>(default);
+        
         configure.UseEntityFramework(
             ef =>
             {

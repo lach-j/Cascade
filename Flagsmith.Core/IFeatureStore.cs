@@ -6,8 +6,9 @@ public interface IFeatureStore
 
     Task<IEnumerable<FeatureFlag>> GetAllFeaturesAsync();
 
-    Task UpdateFeatureAsync(string featureKey, bool enabled, long tenantId = default);
+    Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default);
 
-    Task<IEnumerable<Tenant>> GetAllTenantsAsync();
     Task<IEnumerable<TenantOverride>> GetFeatureTenantOverridesAsync(string featureId);
+    Task DeleteFeatureTenantOverrideAsync(string featureId, string tenantId);
+    Task AddFeatureTenantOverrideAsync(string featureId, string tenantId, bool enabled);
 }

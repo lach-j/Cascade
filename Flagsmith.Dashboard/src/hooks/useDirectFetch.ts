@@ -9,7 +9,7 @@ const getBasePath = () => {
 const useDirectFetch = <T = unknown, TParams = unknown>(
   url: string | ((params: TParams) => string),
   options?: {
-    method: "GET" | "POST" | "PATCH" | "PUT";
+    method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   }
 ) => {
   const path = React.useMemo(() => getBasePath(), []);

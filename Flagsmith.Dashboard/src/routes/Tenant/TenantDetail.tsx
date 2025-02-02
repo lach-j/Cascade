@@ -22,15 +22,20 @@ import Tooltip from "../../components/Tooltip";
 import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
 import { FeatureFlag } from "../Feature/FeatureDetail";
 import Navbar from "../../components/Navbar";
+import ExternalLink from "../../components/ExternalLink";
 
 const TenantDetail = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { tenantId } = useParams();
   const navigate = useNavigate();
-  const { availableTenants, availableFeatures, updateFeatureState } =
-    useFeatureContext();
+  const {
+    availableTenants,
+    availableFeatures,
+    updateFeatureState,
+    toggleOverride,
+  } = useFeatureContext();
 
-  const tenant = availableTenants.find((t) => t.id === Number(tenantId));
+  const tenant = availableTenants.find((t) => t.id === tenantId);
 
   const tableCols: ColumnDefinition<{
     feature: FeatureFlag;
@@ -118,7 +123,7 @@ const TenantDetail = () => {
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={() => {
-                      console.log("Delete tenant");
+                      toggleOverride(tenant?.id ?? "", item.feature.id);
                     }}
                   >
                     {item.override ? "Remove Override" : "Override"}
@@ -131,7 +136,7 @@ const TenantDetail = () => {
         shrink: true,
       },
     ],
-    [navigate, tenant, updateFeatureState]
+    [navigate, tenant?.id, toggleOverride, updateFeatureState]
   );
 
   const featureStates = availableFeatures.map(({ tenantStates, feature }) => {
@@ -160,7 +165,12 @@ const TenantDetail = () => {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {tenant.name}
               </h1>
-              <p className="text-gray-600">{tenant.id}</p>
+              <div className="flex gap-2">
+                <p className="text-gray-600">{tenant.id}</p>
+                {tenant.url && (
+                  <ExternalLink href={tenant.url}>{tenant.url}</ExternalLink>
+                )}
+              </div>
             </div>
           </div>
 

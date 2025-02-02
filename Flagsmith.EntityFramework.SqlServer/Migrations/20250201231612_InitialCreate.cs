@@ -45,10 +45,11 @@ namespace Flagsmith.EntityFramework.SqlServer.Migrations
                 columns: table => new
                 {
                     FeatureId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    TenantId = table.Column<long>(type: "bigint", nullable: false),
+                    TenantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsEnabled = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TenantEntityId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -60,17 +61,16 @@ namespace Flagsmith.EntityFramework.SqlServer.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TenantOverrides_Tenants_TenantId",
-                        column: x => x.TenantId,
+                        name: "FK_TenantOverrides_Tenants_TenantEntityId",
+                        column: x => x.TenantEntityId,
                         principalTable: "Tenants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantOverrides_TenantId",
+                name: "IX_TenantOverrides_TenantEntityId",
                 table: "TenantOverrides",
-                column: "TenantId");
+                column: "TenantEntityId");
         }
 
         /// <inheritdoc />
