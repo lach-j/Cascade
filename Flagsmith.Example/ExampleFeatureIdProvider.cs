@@ -43,4 +43,6 @@ public class Toggles
     public const string WorkflowAutomation = nameof(WorkflowAutomation);
 
     public const string AiSummarisation = nameof(AiSummarisation);
+
+    public const string SomeNewFeatureIAdded = nameof(SomeNewFeatureIAdded);
 }

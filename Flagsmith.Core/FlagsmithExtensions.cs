@@ -108,6 +108,20 @@ public static class FlagsmithExtensions
             });
         }
 
+        if (options.CreateMissingFeaturesOnStart)
+        {
+            try
+            {
+                using var scope = app.ApplicationServices.CreateScope();
+                var services = scope.ServiceProvider.GetRequiredService<IFeatureToggleService>();
+                services.BulkCreateMissing().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to created missing features: {ex}");
+            }
+        }
+
         return app;
     }
 }
@@ -117,6 +131,8 @@ public class FlagsmithOptions
     public bool EnableDashboard { get; set; } = true;
 
     public string DashboardPath { get; set; } = "/flagsmith";
+
+    public bool CreateMissingFeaturesOnStart = false;
 
     public bool RequireAuthentication { get; set; } = true;
     public string[] AllowedRoles { get; set; } = new[] { "Admin" };
