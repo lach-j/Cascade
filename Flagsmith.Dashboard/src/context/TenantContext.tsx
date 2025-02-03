@@ -15,7 +15,8 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
     }[]
   >("api/feature-flags");
 
-  const { data: availableIds } = useFetch<string[]>("api/available-ids");
+  const { data: availableIds, refetch: refetchAvailableIds } =
+    useFetch<string[]>("api/available-ids");
 
   const toggleFeature = useDirectFetch<
     void,
@@ -41,6 +42,13 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
     }
   );
 
+  const bulkCreateMissing = useDirectFetch<void, void>(
+    () => `api/management/bulk-create-missing`,
+    {
+      method: "POST",
+    }
+  );
+
   return (
     <FeatureContext.Provider
       value={{
@@ -52,6 +60,11 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
         },
         toggleOverride: async (tenantId, featureId) => {
           await toggleOverride({ featureId, tenantId });
+          await refetchFeatures();
+        },
+        bulkCreateMissing: async () => {
+          await bulkCreateMissing();
+          await refetchAvailableIds();
           await refetchFeatures();
         },
         availableIds: availableIds || [],

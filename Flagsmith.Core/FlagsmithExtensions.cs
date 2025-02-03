@@ -94,6 +94,13 @@ public static class FlagsmithExtensions
                                 "/tenants/{tenantId}/overrides/{featureId}",
                                 async (string tenantId, string featureId, IFeatureToggleService service) => await service.ToggleOverride(featureId, tenantId));
 
+                            api.MapPost(
+                                "/management/bulk-create-missing",
+                                async (IFeatureToggleService service) =>
+                                {
+                                    await service.BulkCreateMissing();
+                                });
+
                             api.MapFallback(() => Results.NotFound());
                     });
 

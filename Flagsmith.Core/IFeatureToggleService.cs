@@ -15,6 +15,8 @@ public interface IFeatureToggleService
     Task<bool> IsEnabledAsync(string featureKey, string? tenantId = default);
 
     Task ToggleOverride(string featureKey, string tenantId);
+
+    Task BulkCreateMissing();
 }
 
 public class TenantState
@@ -28,7 +30,8 @@ public class FeatureFlag
 {
     public string Id { get; set; }
     public string Name { get; set; }
-    public string Description { get; set; }
+
+    public string Description { get; set; } = "";
     public bool IsEnabled { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

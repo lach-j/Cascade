@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
-import FeatureFlagDashboard from "./routes/Feature/Dashboard.tsx";
+import FeatureFlagDashboard from "./routes/Feature/FeatureFlagDashboard.tsx";
 import FeatureDetail from "./routes/Feature/FeatureDetail.tsx";
 import TenantDetail from "./routes/Tenant/TenantDetail.tsx";
 import FeatureProviderLayout from "./routes/layouts/FeatureProviderLayout.tsx";

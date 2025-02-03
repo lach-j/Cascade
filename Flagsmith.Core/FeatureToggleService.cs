@@ -80,4 +80,41 @@ public class FeatureToggleService : IFeatureToggleService
             await _featureStore.AddFeatureTenantOverrideAsync(featureKey, tenantId, feature.IsEnabled);
         }
     }
+
+    public async Task BulkCreateMissing()
+    {
+        var featureIds = _idProvider.GetFeatureIds().ToHashSet();
+        var features = (await _featureStore.GetAllFeaturesAsync()).ToDictionary(f => f.Id);
+
+        var featuresToCreate = featureIds.Where(f => !features.ContainsKey(f));
+        foreach (var feature in featuresToCreate)
+        {
+            var featureFlag = new FeatureFlag()
+            {
+                Id = feature,
+                Name = GenerateFeatureName(feature),
+                IsEnabled = false,
+            };
+            await _featureStore.CreateFeatureAsync(featureFlag);
+        }
+    }
+    
+    private static string GenerateFeatureName(string featureId)
+    {
+        if (string.IsNullOrEmpty(featureId))
+            return string.Empty;
+
+        var withSpaces = featureId.Replace("-", " ");
+
+        var separated = string.Concat(withSpaces.Select((c, i) => 
+            (i > 0 && char.IsUpper(c) && !char.IsUpper(withSpaces[i - 1]))
+                ? " " + c
+                : c.ToString()));
+
+        return string.Join(" ", 
+            separated.Split(' ')
+                .Select(word => word.Length > 0 
+                    ? char.ToUpper(word[0]) + word.Substring(1).ToLower() 
+                    : word));
+    }
 }

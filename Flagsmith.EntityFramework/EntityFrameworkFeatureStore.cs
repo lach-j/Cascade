@@ -61,6 +61,21 @@ public class EntityFrameworkFeatureStore : IFeatureStore
         await _context.SaveChangesAsync();
     }
 
+    public async Task CreateFeatureAsync(FeatureFlag flag)
+    {
+        var entity = new FeatureFlagEntity()
+        {
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Id = flag.Id,
+            Description = flag.Description,
+            Name = flag.Name,
+            IsEnabled = flag.IsEnabled,
+        };
+        _context.Features.Add(entity);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default)
     {
         if (tenantId != default)
