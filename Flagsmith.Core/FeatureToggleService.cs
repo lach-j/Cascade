@@ -1,4 +1,6 @@
-﻿namespace Flagsmith.Core;
+﻿using Humanizer;
+
+namespace Flagsmith.Core;
 
 public class FeatureToggleService : IFeatureToggleService
 {
@@ -78,6 +80,25 @@ public class FeatureToggleService : IFeatureToggleService
         else
         {
             await _featureStore.AddFeatureTenantOverrideAsync(featureKey, tenantId, feature.IsEnabled);
+        }
+    }
+
+    public async Task BulkCreateMissing()
+    {
+        var featureIds = _idProvider.GetFeatureIds().ToHashSet();
+        var features = (await _featureStore.GetAllFeaturesAsync()).ToDictionary(f => f.Id);
+
+        var featuresToCreate = featureIds.Where(f => !features.ContainsKey(f));
+        foreach (var feature in featuresToCreate)
+        {
+            var featureFlag = new FeatureFlag()
+            {
+                Id = feature,
+                Name = feature.Humanize(LetterCasing.Title),
+                IsEnabled = false,
+            };
+            await _featureStore.CreateFeatureAsync(featureFlag);
+            
         }
     }
 }

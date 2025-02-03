@@ -28,6 +28,7 @@ export type FeatureContextType = {
   ) => Promise<void>;
   availableIds: string[];
   toggleOverride: (tenantId: string, featureId: string) => Promise<void>;
+  bulkCreateMissing: () => Promise<void>;
 };
 
 export const FeatureContext = React.createContext<FeatureContextType>({
@@ -36,4 +37,5 @@ export const FeatureContext = React.createContext<FeatureContextType>({
   updateFeatureState: () => new Promise((res) => res),
   availableIds: [],
   toggleOverride: () => new Promise((res) => res),
+  bulkCreateMissing: () => new Promise((res) => res),
 });

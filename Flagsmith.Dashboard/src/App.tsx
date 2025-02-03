@@ -1,4 +1,4 @@
-import FeatureFlagDashboard from "./routes/Feature/Dashboard";
+import FeatureFlagDashboard from "./routes/Feature/FeatureFlagDashboard";
 
 function App() {
   return <FeatureFlagDashboard />;

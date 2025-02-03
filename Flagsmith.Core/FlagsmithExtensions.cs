@@ -94,11 +94,32 @@ public static class FlagsmithExtensions
                                 "/tenants/{tenantId}/overrides/{featureId}",
                                 async (string tenantId, string featureId, IFeatureToggleService service) => await service.ToggleOverride(featureId, tenantId));
 
+                            api.MapPost(
+                                "/management/bulk-create-missing",
+                                async (IFeatureToggleService service) =>
+                                {
+                                    await service.BulkCreateMissing();
+                                });
+
                             api.MapFallback(() => Results.NotFound());
                     });
 
                 builder.UseMiddleware<FlagsmithDashboardMiddleware>();
             });
+        }
+
+        if (options.CreateMissingFeaturesOnStart)
+        {
+            try
+            {
+                using var scope = app.ApplicationServices.CreateScope();
+                var services = scope.ServiceProvider.GetRequiredService<IFeatureToggleService>();
+                services.BulkCreateMissing().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to created missing features: {ex}");
+            }
         }
 
         return app;
@@ -110,6 +131,8 @@ public class FlagsmithOptions
     public bool EnableDashboard { get; set; } = true;
 
     public string DashboardPath { get; set; } = "/flagsmith";
+
+    public bool CreateMissingFeaturesOnStart = false;
 
     public bool RequireAuthentication { get; set; } = true;
     public string[] AllowedRoles { get; set; } = new[] { "Admin" };

@@ -11,4 +11,6 @@ public interface IFeatureStore
     Task<IEnumerable<TenantOverride>> GetFeatureTenantOverridesAsync(string featureId);
     Task DeleteFeatureTenantOverrideAsync(string featureId, string tenantId);
     Task AddFeatureTenantOverrideAsync(string featureId, string tenantId, bool enabled);
+
+    Task CreateFeatureAsync(FeatureFlag flag);
 }
