@@ -80,10 +80,7 @@ const TenantDashboard = () => {
                       <CardDescription>ID: {tenant.id}</CardDescription>
                     </div>
                     <div className="p-2 rounded-full bg-gray-100">
-                      <OrganisationIcon
-                        className="w-6 h-6 text-gray-600"
-                        text={tenant.name}
-                      />
+                      <OrganisationIcon text={tenant.name} />
                     </div>
                   </div>
                 </CardHeader>

@@ -12,17 +12,19 @@ import {
   LuCircleX,
   LuSearch,
   LuPlus,
+  LuTriangleAlert,
 } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useFeatureContext } from "../../context/useTenants";
 import NavTabs, { NavTab } from "../../components/Tabs";
 import Code from "../../components/Code";
+import Tooltip from "../../components/Tooltip";
 
 const FeatureFlagDashboard = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  const { availableFeatures, availableIds, bulkCreateMissing } =
+  const { availableFeatures, availableIds, knownIds, bulkCreateMissing } =
     useFeatureContext();
 
   const flags = availableFeatures?.filter(({ feature }) =>
@@ -67,8 +69,13 @@ const FeatureFlagDashboard = () => {
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg font-semibold mb-1">
-                      {flag.name}
+                    <CardTitle className="text-lg font-semibold mb-1 flex items-center gap-2">
+                      {flag.name}{" "}
+                      {!knownIds.some((id) => id === flag.id) && (
+                        <Tooltip text="This feature does not correspond to any ID configured in the application">
+                          <LuTriangleAlert className="text-yellow-500" />
+                        </Tooltip>
+                      )}
                     </CardTitle>
                     <CardDescription>{flag.description}</CardDescription>
                   </div>

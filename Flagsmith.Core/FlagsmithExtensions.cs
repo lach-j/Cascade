@@ -77,6 +77,7 @@ public static class FlagsmithExtensions
                             });
                             
                             api.MapGet("/available-ids", async (IFeatureToggleService service) => await service.GetAvailableFeatureIds());
+                            api.MapGet("/known-ids", (IFeatureToggleService service) => service.GetAllFeatureIds());
                             
                             api.MapPatch(
                                 "/feature-flags/{featureId}",

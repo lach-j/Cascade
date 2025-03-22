@@ -17,6 +17,8 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
 
   const { data: availableIds, refetch: refetchAvailableIds } =
     useFetch<string[]>("api/available-ids");
+  const { data: knownIds, refetch: refetchKnownIds } =
+    useFetch<string[]>("api/known-ids");
 
   const toggleFeature = useDirectFetch<
     void,
@@ -65,9 +67,11 @@ const FeatureContextProvider = ({ children }: React.PropsWithChildren) => {
         bulkCreateMissing: async () => {
           await bulkCreateMissing();
           await refetchAvailableIds();
+          await refetchKnownIds();
           await refetchFeatures();
         },
         availableIds: availableIds || [],
+        knownIds: knownIds || [],
       }}
     >
       {children}
