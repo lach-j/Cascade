@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using Flagsmith.Core.Models;
+using Humanizer;
 
 namespace Flagsmith.Core;
 

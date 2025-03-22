@@ -1,4 +1,5 @@
 using Flagsmith.Core;
+using Flagsmith.Core.Authentication;
 using Flagsmith.EntityFramework;
 using Flagsmith.EntityFramework.SqlServer;
 using Flagsmith.Example;
@@ -23,8 +24,12 @@ builder.Services.AddFlagsmith(
     options =>
     {
         options.EnableDashboard = true;
+        options.RequireAuthentication = true;
+        options.AuthenticationProvider = typeof(BasicAuthenticationProvider);
         options.CreateMissingFeaturesOnStart = true;
     });
+
+builder.Services.AddScoped<BasicAuthenticationProvider>(_ => new BasicAuthenticationProvider("admin", "password"));
 
 var app = builder.Build();
 
