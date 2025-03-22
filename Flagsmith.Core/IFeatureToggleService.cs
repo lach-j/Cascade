@@ -6,6 +6,7 @@ public interface IFeatureToggleService
     Task<IEnumerable<TenantState>> GetTenantStateByFeature(string featureId);
     Task<FeatureFlag?> GetFeature(string featureId);
     Task<IEnumerable<string>> GetAvailableFeatureIds();
+    IEnumerable<string> GetAllFeatureIds();
 
 
     Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default);

@@ -49,6 +49,11 @@ public class FeatureToggleService : IFeatureToggleService
         return _idProvider.GetFeatureIds().Where(x => !existingFeatures.Contains(x));
     }
 
+    public IEnumerable<string> GetAllFeatureIds()
+    {
+        return _idProvider.GetFeatureIds();
+    }
+
     public async Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default)
     {
         await _featureStore.UpdateFeatureAsync(featureKey, enabled, tenantId);
