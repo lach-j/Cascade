@@ -1,4 +1,5 @@
 ﻿using Flagsmith.Core;
+using Flagsmith.Core.Models;
 using Microsoft.Data.SqlClient;
 
 namespace Flagsmith.Example;

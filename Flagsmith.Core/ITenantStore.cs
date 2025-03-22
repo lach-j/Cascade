@@ -1,4 +1,6 @@
-﻿namespace Flagsmith.Core;
+﻿using Flagsmith.Core.Models;
+
+namespace Flagsmith.Core;
 
 public interface ITenantStore
 {

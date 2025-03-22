@@ -1,4 +1,5 @@
 ﻿using Flagsmith.Core;
+using Flagsmith.Core.Models;
 using Flagsmith.EntityFramework.Models;
 using Microsoft.EntityFrameworkCore;
 

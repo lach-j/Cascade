@@ -1,4 +1,5 @@
 using Flagsmith.Core;
+using Flagsmith.Core.Authentication;
 using Flagsmith.EntityFramework;
 using Flagsmith.EntityFramework.SqlServer;
 using Flagsmith.Example;
@@ -19,6 +20,7 @@ builder.Services.AddFlagsmith(
             });
 
         configure.RegisterFeatureIdProvider<ExampleFeatureIdProvider>(default);
+        configure.RegisterAuthenticationProvider(_ => new BasicAuthenticationProvider("admin", "password"));
     },
     options =>
     {
