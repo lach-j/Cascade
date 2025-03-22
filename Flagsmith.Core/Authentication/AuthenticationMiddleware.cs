@@ -17,13 +17,9 @@ public class FlagsmithAuthenticationMiddleware
             return;
         }
 
-        if (options.AuthenticationProvider == null)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return;
-        }
-
-        if (serviceProvider.GetService(options.AuthenticationProvider) is not IAuthenticationProvider authProvider)
+        var authProvider = serviceProvider.GetService<IAuthenticationProvider>();
+        
+        if (authProvider is null)
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             return;

@@ -14,16 +14,18 @@ public static class FlagsmithExtensions
     {
         var options = new FlagsmithOptions();
         optionsActions?.Invoke(options);
-
-        services.AddSingleton(options);
-
+        
         // Register core services first
         services.AddScoped<IFeatureToggleService, FeatureToggleService>();
-
+        
         // Then configure additional services
         var builder = new FlagsmithBuilder(services);
         configure(builder);
 
+        options.RequireAuthentication = builder.UsesAuthentication;
+
+        services.AddSingleton(options);
+        
         if (!builder.FeatureIdProviderConfigured)
         {
             builder.RegisterFeatureIdProvider<DefaultFeatureIdProvider>(default);
@@ -146,10 +148,8 @@ public class FlagsmithOptions
     public string DashboardPath { get; set; } = "/flagsmith";
 
     public bool CreateMissingFeaturesOnStart = false;
-
+    
     public bool RequireAuthentication { get; set; } = false;
-
-    public Type? AuthenticationProvider { get; set; }
 }
 
 public class FlagsmithBuilder
@@ -159,6 +159,8 @@ public class FlagsmithBuilder
     public bool FeatureIdProviderConfigured { get; private set; }
 
     public bool HasCustomTenantStore { get; private set; }
+    
+    public bool UsesAuthentication { get; private set; }
 
     public FlagsmithBuilder(IServiceCollection services)
     {
@@ -195,6 +197,23 @@ public class FlagsmithBuilder
         }
 
         HasCustomTenantStore = true;
+
+        return this;
+    }
+    
+    public FlagsmithBuilder RegisterAuthenticationProvider<T>(Func<IServiceProvider, T>? implementation)
+        where T : class, IAuthenticationProvider
+    {
+        if (implementation != default)
+        {
+            Services.AddScoped<IAuthenticationProvider>(implementation);
+        }
+        else
+        {
+            Services.AddScoped<IAuthenticationProvider, T>();
+        }
+
+        UsesAuthentication = true;
 
         return this;
     }

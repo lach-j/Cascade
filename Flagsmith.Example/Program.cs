@@ -20,16 +20,13 @@ builder.Services.AddFlagsmith(
             });
 
         configure.RegisterFeatureIdProvider<ExampleFeatureIdProvider>(default);
+        configure.RegisterAuthenticationProvider(_ => new BasicAuthenticationProvider("admin", "password"));
     },
     options =>
     {
         options.EnableDashboard = true;
-        options.RequireAuthentication = true;
-        options.AuthenticationProvider = typeof(BasicAuthenticationProvider);
         options.CreateMissingFeaturesOnStart = true;
     });
-
-builder.Services.AddScoped<BasicAuthenticationProvider>(_ => new BasicAuthenticationProvider("admin", "password"));
 
 var app = builder.Build();
 
