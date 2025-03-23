@@ -54,7 +54,7 @@ public static class FlagsmithExtensions
 
                             api.MapGet(
                                 "/feature-flags",
-                                async (IFeatureToggleService service) =>
+                                async ([FromServices] IFeatureToggleService service) =>
                                 {
                                     var features = await service.GetAllFeaturesAsync();
 
@@ -75,7 +75,7 @@ public static class FlagsmithExtensions
                                 });
                             api.MapGet(
                                 "/feature-flags/{featureId}",
-                                async (string featureId, IFeatureToggleService service) =>
+                                async (string featureId, [FromServices] IFeatureToggleService service) =>
                                 {
                                     var feature = await service.GetFeature(featureId);
                                     var tenants = await service.GetTenantStateByFeature(featureId);
@@ -88,8 +88,8 @@ public static class FlagsmithExtensions
 
                             api.MapGet(
                                 "/available-ids",
-                                async (IFeatureToggleService service) => await service.GetAvailableFeatureIds());
-                            api.MapGet("/known-ids", (IFeatureToggleService service) => service.GetAllFeatureIds());
+                                async ([FromServices] IFeatureToggleService service) => await service.GetAvailableFeatureIds());
+                            api.MapGet("/known-ids", ([FromServices] IFeatureToggleService service) => service.GetAllFeatureIds());
 
                             api.MapPatch(
                                 "/feature-flags/{featureId}",
@@ -97,7 +97,7 @@ public static class FlagsmithExtensions
                                     string featureId,
                                     [FromQuery(Name = "tenantId")] string? tenantId,
                                     [FromQuery(Name = "enabled")] bool enabled,
-                                    IFeatureToggleService service) =>
+                                    [FromServices] IFeatureToggleService service) =>
                                 {
                                     await service.UpdateFeatureAsync(featureId, enabled, tenantId);
                                 });
@@ -105,16 +105,16 @@ public static class FlagsmithExtensions
 
                             api.MapGet(
                                 "/tenants",
-                                async (IFeatureToggleService service) => await service.GetAllTenantsAsync());
+                                async ([FromServices] IFeatureToggleService service) => await service.GetAllTenantsAsync());
 
                             api.MapDelete(
                                 "/tenants/{tenantId}/overrides/{featureId}",
-                                async (string tenantId, string featureId, IFeatureToggleService service) =>
+                                async (string tenantId, string featureId, [FromServices] IFeatureToggleService service) =>
                                     await service.ToggleOverride(featureId, tenantId));
 
                             api.MapPost(
                                 "/management/bulk-create-missing",
-                                async (IFeatureToggleService service) => { await service.BulkCreateMissing(); });
+                                async ([FromServices] IFeatureToggleService service) => { await service.BulkCreateMissing(); });
 
                             api.MapFallback(() => Results.NotFound());
                         });
@@ -150,6 +150,8 @@ public class FlagsmithOptions
     public bool CreateMissingFeaturesOnStart = false;
     
     public bool RequireAuthentication { get; set; } = false;
+    
+    public bool EnableDevServer { get; set; } = false;
 }
 
 public class FlagsmithBuilder

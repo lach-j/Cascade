@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Text.RegularExpressions;
 
 namespace Flagsmith.Core;
 
@@ -10,6 +9,8 @@ public class FlagsmithDashboardMiddleware
     private readonly FlagsmithOptions _options;
     private readonly IWebHostEnvironment _env;
     private readonly HttpClient _httpClient;
+
+    private readonly bool _isLocalDevelopment;
     
     private static readonly Dictionary<string, string> ContentTypes = new()
     {
@@ -32,11 +33,13 @@ public class FlagsmithDashboardMiddleware
         _options = options;
         _env = env;
         _httpClient = new HttpClient();
+        
+        _isLocalDevelopment = env.IsDevelopment() && options.EnableDevServer;
     }
 
     public async Task InvokeAsync(HttpContext context, IFeatureToggleService featureService)
     {
-        if (_env.IsDevelopment())
+        if (_isLocalDevelopment)
         {
             await ProxyToDevServer(context);
             return;

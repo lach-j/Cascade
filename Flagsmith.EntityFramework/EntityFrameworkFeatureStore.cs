@@ -79,33 +79,36 @@ public class EntityFrameworkFeatureStore : IFeatureStore
 
     public async Task UpdateFeatureAsync(string featureKey, bool enabled, string? tenantId = default)
     {
+        var feature = await _context.Features.FindAsync(featureKey);
+        if (feature is null) return;
+
         if (tenantId != default)
         {
-            var @override = await _context.TenantOverrides
+            var tenantOverride = await _context.TenantOverrides
                 .FirstOrDefaultAsync(to => to.FeatureId == featureKey && to.TenantId == tenantId);
 
-            if (@override == null)
+            var requiresOverride = tenantOverride is null && feature.IsEnabled != enabled;
+            if (requiresOverride)
             {
-                @override = new TenantOverrideEntity
+                tenantOverride = new TenantOverrideEntity
                 {
                     FeatureId = featureKey,
                     TenantId = tenantId,
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.TenantOverrides.Add(@override);
+                _context.TenantOverrides.Add(tenantOverride);
             }
 
-            @override.IsEnabled = enabled;
-            @override.UpdatedAt = DateTime.UtcNow;
+            if (tenantOverride != null)
+            {
+                tenantOverride.IsEnabled = enabled;
+                tenantOverride.UpdatedAt = DateTime.UtcNow;
+            }
         }
         else
         {
-            var feature = await _context.Features.FindAsync(featureKey);
-            if (feature != null)
-            {
-                feature.IsEnabled = enabled;
-                feature.UpdatedAt = DateTime.UtcNow;
-            }
+            feature.IsEnabled = enabled;
+            feature.UpdatedAt = DateTime.UtcNow;
         }
 
         await _context.SaveChangesAsync();

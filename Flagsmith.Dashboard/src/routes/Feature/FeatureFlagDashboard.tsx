@@ -27,8 +27,10 @@ const FeatureFlagDashboard = () => {
   const { availableFeatures, availableIds, knownIds, bulkCreateMissing } =
     useFeatureContext();
 
-  const flags = availableFeatures?.filter(({ feature }) =>
-    feature.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const flags = availableFeatures?.filter(
+    ({ feature }) =>
+      feature.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      feature.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

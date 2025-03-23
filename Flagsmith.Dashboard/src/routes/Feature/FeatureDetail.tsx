@@ -154,7 +154,7 @@ const FeatureDetail = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <Navbar />
+          <Navbar backRoute="/features" />
           <div className="flex gap-5 items-start mb-6">
             <ToggleButton
               size="xl"

@@ -271,7 +271,7 @@ const OrganisationIcon = ({
     return <IconComponent size={size} color={color} className={className} />;
   };
 
-  return <div className="inline-block">{getIconComponent(text)}</div>;
+  return getIconComponent(text);
 };
 
 export default OrganisationIcon;

@@ -26,6 +26,7 @@ builder.Services.AddFlagsmith(
     {
         options.EnableDashboard = true;
         options.CreateMissingFeaturesOnStart = true;
+        options.EnableDevServer = true;
     });
 
 var app = builder.Build();
