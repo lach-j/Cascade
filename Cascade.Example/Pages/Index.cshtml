@@ -1,0 +1,64 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@* Code example *@
+<div class="text">
+    <h1 class="display-4">Usage</h1>
+    <p class="lead">This is an example of how to configure Cascade in a .NET Core application.</p>
+    <div class="language-csharp">
+        <pre>
+            <code>// Program.cs
+
+var builder = WebApplication.CreateBuilder(args);
+
+var dbConnectionString = builder.Configuration.GetConnectionString("CascadeDb");
+
+builder.Services.AddRazorPages();
+builder.Services.AddCascade(
+    configure =>
+    {
+        configure.RegisterCustomTenantStore<ExampleTenantProvider>(default);
+
+        configure.UseEntityFramework(
+            ef =>
+            {
+                ef.UseSqlServer(dbConnectionString);
+            });
+
+        configure.RegisterFeatureIdProvider<ExampleFeatureIdProvider>(default);
+        configure.RegisterAuthenticationProvider(_ => new BasicAuthenticationProvider("admin", "password"));
+    },
+    options =>
+    {
+        options.EnableDashboard = true;
+        options.CreateMissingFeaturesOnStart = true;
+    });
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthorization();
+
+app.UseCascade();
+
+app.MapRazorPages();
+
+app.Run();</code>
+        </pre>
+        <p>See a demo <a href="/Cascade">here</a>.</p>
+    </div>
+    </div>
