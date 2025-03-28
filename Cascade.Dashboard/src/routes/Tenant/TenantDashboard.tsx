@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/Card";
-import { LuChartBar, LuSearch } from "react-icons/lu";
+import { LuChartBar } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useFeatureContext } from "../../context/useTenants";
 import NavTabs, { NavTab } from "../../components/Tabs";

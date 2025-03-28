@@ -7,7 +7,6 @@ import {
 } from "../../components/Card";
 import {
   LuChartBar,
-  LuSearch,
   LuPlus,
   LuTriangleAlert,
 } from "react-icons/lu";
@@ -28,7 +27,6 @@ const FeatureFlagDashboard = () => {
 
   const {
     filteredItems: flags,
-    filter: searchTerm,
     setFilter: setSearchTerm,
   } = useFiltering(availableFeatures, (feature) => [
     feature.feature.name,
