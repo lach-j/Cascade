@@ -16,6 +16,13 @@ public class ExampleTenantProvider : ITenantStore
 
     public Task<IEnumerable<Tenant>> GetAllTenantsAsync()
     {
+        return Task.FromResult(Enumerable.Range(1, 10).Select(i => new Tenant()
+        {
+            Id = $"cascade-tenant-{i}",
+            Name = $"Tenant {i}",
+            Url = $"https://tenant{i}.mywebapp.com",
+        }).ToList().AsEnumerable());
+        
         using (var connection = new SqlConnection(_connectionString))
         {
             var command = new SqlCommand("SELECT [prefix], [Name] FROM TenantConfigurations ORDER BY [name] ASC;", connection);

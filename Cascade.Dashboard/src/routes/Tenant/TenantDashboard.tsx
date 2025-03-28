@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -11,16 +10,14 @@ import { useNavigate } from "react-router";
 import { useFeatureContext } from "../../context/useTenants";
 import NavTabs, { NavTab } from "../../components/Tabs";
 import OrganisationIcon from "../../components/OrganisationIcon";
+import useFiltering from "../../hooks/useFiltering";
+import SearchBar from "../../components/SearchBar";
 
 const TenantDashboard = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = React.useState("");
 
   const { availableTenants, availableFeatures } = useFeatureContext();
-
-  const tenants = availableTenants?.filter((tenant) =>
-    tenant.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { filteredItems: tenants, setFilter: setSearchTerm  } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -39,16 +36,10 @@ const TenantDashboard = () => {
         </div>
 
         <div className="mb-6">
-          <div className="relative">
-            <LuSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search tenants..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+          <SearchBar
+            placeholder="Search tenants..."
+            onChange={(term) => setSearchTerm(term)}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -80,6 +80,7 @@ const ToggleButton = ({
     <button
       disabled={isLoading || isReadOnly}
       className={styles.cx(
+        styles.button,
         sizedStyles.button,
         stateStyles.button,
         hoverClass,

@@ -1,7 +1,6 @@
 import React from "react";
 import {
   LuCircleCheck,
-  LuSearch,
   LuCircleAlert,
   LuInfo,
   LuEllipsisVertical,
@@ -23,9 +22,10 @@ import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
 import { FeatureFlag } from "../Feature/FeatureDetail";
 import Navbar from "../../components/Navbar";
 import ExternalLink from "../../components/ExternalLink";
+import SearchBar from "../../components/SearchBar";
+import useFiltering from "../../hooks/useFiltering";
 
 const TenantDetail = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
   const { tenantId } = useParams();
   const navigate = useNavigate();
   const {
@@ -50,11 +50,10 @@ const TenantDetail = () => {
           return (
             <button
               disabled={isLoading}
-              className={`flex items-center gap-2 px-2 py-2 rounded-lg ${
-                item.isEnabled
+              className={`flex items-center gap-2 px-2 py-2 rounded-lg ${item.isEnabled
                   ? "bg-green-100 text-green-700 hover:bg-green-200"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+                }`}
               onClick={async () => {
                 setIsLoading(true);
                 await updateFeatureState(
@@ -148,9 +147,7 @@ const TenantDetail = () => {
     };
   });
 
-  const filteredFeatures = featureStates.filter(({ feature }) =>
-    feature.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { setFilter: setSearchTerm, filteredItems: filteredFeatures } = useFiltering(featureStates, (item) => [item.feature.name, item.feature.id]);
 
   if (!tenant) return <p>Loading...</p>;
 
@@ -181,16 +178,7 @@ const TenantDetail = () => {
         </div>
 
         <div className="mb-6">
-          <div className="relative">
-            <LuSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search features..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+          <SearchBar placeholder="Search features" onChange={term => setSearchTerm(term)} />
         </div>
 
         <Card>

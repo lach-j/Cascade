@@ -16,6 +16,7 @@ import SearchBar from "../../components/SearchBar";
 import Code from "../../components/Code";
 import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
 import ToggleButton from "../../components/ToggleButton";
+import useFiltering from "../../hooks/useFiltering";
 
 export type FeatureFlag = {
   id: string;
@@ -38,7 +39,6 @@ export type TenantState = {
 };
 
 const FeatureDetail = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
   const [isFilteringOverrides, setIsFilteringOverrides] = React.useState(false);
   const { featureId } = useParams();
   const navigate = useNavigate();
@@ -53,12 +53,9 @@ const FeatureDetail = () => {
     (f) => f.feature.id === featureId
   );
 
-  const filteredTenants = availableTenants.filter(
-    (tenant) =>
-      (tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !isFilteringOverrides) ||
-      foundFeature?.tenantStates.find((t) => t.tenantId === tenant.id)?.override
-  );
+  const { filteredItems: tenants, setFilter: setSearchTerm  } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
+  const filteredTenants = tenants.filter(
+    (tenant) => !isFilteringOverrides || foundFeature?.tenantStates.find((t) => t.tenantId === tenant.id)?.override);
 
   const tableCols: ColumnDefinition<Tenant>[] = React.useMemo(
     () => [
