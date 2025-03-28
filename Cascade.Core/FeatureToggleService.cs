@@ -68,6 +68,12 @@ public class FeatureToggleService : IFeatureToggleService
     public async Task<bool> IsEnabledAsync(string featureKey, string tenantId = default)
     {
         var flag = await _featureStore.GetFeature(featureKey);
+        
+        if (flag is null) return false;
+        var tenantOverrides = await _featureStore.GetFeatureTenantOverridesAsync(featureKey);
+        var tenantOverride = tenantOverrides.FirstOrDefault(x => x.TenantId == tenantId);
+        if (tenantOverride is not null) return tenantOverride.Enabled;
+        
         return flag?.IsEnabled ?? false;
     }
 

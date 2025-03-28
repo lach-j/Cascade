@@ -9,29 +9,33 @@ import {
 import {
   LuChartBar,
   LuCircleCheck,
-  LuCircleX,
   LuSearch,
   LuPlus,
   LuTriangleAlert,
+  LuCircleDashed,
 } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useFeatureContext } from "../../context/useTenants";
 import NavTabs, { NavTab } from "../../components/Tabs";
 import Code from "../../components/Code";
 import Tooltip from "../../components/Tooltip";
+import useFiltering from "../../hooks/useFiltering";
+import ToggleButton from "../../components/ToggleButton";
 
 const FeatureFlagDashboard = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = React.useState("");
 
   const { availableFeatures, availableIds, knownIds, bulkCreateMissing } =
     useFeatureContext();
 
-  const flags = availableFeatures?.filter(
-    ({ feature }) =>
-      feature.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const {
+    filteredItems: flags,
+    filter: searchTerm,
+    setFilter: setSearchTerm,
+  } = useFiltering(availableFeatures, (feature) => [
+    feature.feature.name,
+    feature.feature.id,
+  ]);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -81,17 +85,11 @@ const FeatureFlagDashboard = () => {
                     </CardTitle>
                     <CardDescription>{flag.description}</CardDescription>
                   </div>
-                  <button
-                    className={`p-2 rounded-full ${
-                      flag.isEnabled ? "bg-green-100" : "bg-red-100"
-                    }`}
-                  >
-                    {flag.isEnabled ? (
-                      <LuCircleCheck className="w-6 h-6 text-green-600" />
-                    ) : (
-                      <LuCircleX className="w-6 h-6 text-red-600" />
-                    )}
-                  </button>
+                  <ToggleButton
+                    isReadOnly
+                    isEnabled={flag.isEnabled}
+                    className="rounded-full"
+                  />
                 </div>
               </CardHeader>
               <CardContent>
@@ -154,6 +152,24 @@ const FeatureFlagDashboard = () => {
       </div>
     </div>
   );
+};
+
+const styles = {
+  page: "p-6 bg-gray-50 min-h-screen",
+  container: "max-w-6xl mx-auto",
+  header: "mb-8",
+  heading: "text-3xl font-bold text-gray-900 mb-2",
+  subheading: "text-gray-600",
+  searchContainer: "mb-6",
+  searchInputWrapper: "relative",
+  searchIcon:
+    "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5",
+  searchInput:
+    "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+  grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+  card: "shadow-sm cursor-pointer hover:shadow-md transition-shadow",
+  cardHeader: "pb-4",
+  cardTitle: "text-lg font-semibold mb-1 flex items-center gap-2",
 };
 
 export default FeatureFlagDashboard;

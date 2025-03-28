@@ -88,9 +88,7 @@ const FeatureDetail = () => {
           <div>
             <h3 className="font-medium text-gray-900">{item.name}</h3>
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{item.id}</span>
-              <span>•</span>
-              <span className="capitalize">X tier</span>
+              {item.id}
             </div>
           </div>
         ),
