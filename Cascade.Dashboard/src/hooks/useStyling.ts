@@ -4,13 +4,6 @@ type StylesObject = Record<string, string>;
 type StylesMap = Record<string, StylesObject>;
 type Condition = boolean | undefined | null;
 
-// Base style methods that are added to every key
-type BaseStyleExtensions<K extends string> = {
-  [P in `${K}If` | `${K}ToggleClass`]: P extends `${K}If`
-    ? (condition: Condition, additionalClasses: string) => string
-    : (condition: Condition, trueClass: string, falseClass?: string) => string;
-};
-
 // Generic utility to create variant method names (withSize, withColor, etc.)
 type WithVariantMethods<
   Variants extends Record<string, StylesMap>,
@@ -32,10 +25,19 @@ type Capitalize<S extends string> = S extends `${infer F}${infer R}`
 export type TailwindStylesReturn<
   Styles extends StylesObject,
   Variants extends Record<string, StylesMap>
-> = Styles & { [K in keyof Styles]: Styles[K] } & {
-  [K in keyof Styles as string & K]: BaseStyleExtensions<
-    string & K
-  >[keyof BaseStyleExtensions<string & K>];
+> = Styles & {
+  [K in keyof Styles]: Styles[K];
+} & {
+  [K in keyof Styles as `${string & K}If`]: (
+    condition: Condition,
+    additionalClasses: string
+  ) => string;
+} & {
+  [K in keyof Styles as `${string & K}ToggleClass`]: (
+    condition: Condition,
+    trueClass: string,
+    falseClass?: string
+  ) => string;
 } & WithVariantMethods<Variants, Styles> & {
     cx: (...classes: (string | Condition)[]) => string;
   };
@@ -45,7 +47,7 @@ export type TailwindStylesReturn<
  */
 export function useTailwindStyles<
   Styles extends StylesObject,
-  Variants extends Record<string, StylesMap> = Record<string, never>
+  Variants extends Record<string, StylesMap> = {}
 >(
   baseStyles: Styles,
   variants?: Variants

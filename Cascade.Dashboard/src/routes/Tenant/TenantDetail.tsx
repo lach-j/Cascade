@@ -51,8 +51,8 @@ const TenantDetail = () => {
             <button
               disabled={isLoading}
               className={`flex items-center gap-2 px-2 py-2 rounded-lg ${item.isEnabled
-                  ? "bg-green-100 text-green-700 hover:bg-green-200"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               onClick={async () => {
                 setIsLoading(true);
@@ -84,13 +84,18 @@ const TenantDetail = () => {
         Cell: ({ item }) => (
           <div>
             <h3 className="font-medium text-gray-900">{item.feature.name}</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-baseline gap-2 text-sm text-gray-500">
               <span>{item.feature.id}</span>
-              <span>•</span>
-              <span className="capitalize">{item.feature.description}</span>
             </div>
           </div>
         ),
+        shrink: true,
+      },
+      {
+        Cell: ({ item }) => (
+          item.feature.description
+        ),
+        className: "text-gray-500 text-xs hidden md:table-cell",
       },
       {
         Cell: ({ item }) =>

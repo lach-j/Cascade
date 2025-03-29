@@ -17,6 +17,8 @@ import Code from "../../components/Code";
 import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
 import ToggleButton from "../../components/ToggleButton";
 import useFiltering from "../../hooks/useFiltering";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "../../components/Modal";
+import Button from "../../components/Button";
 
 export type FeatureFlag = {
   id: string;
@@ -40,6 +42,7 @@ export type TenantState = {
 
 const FeatureDetail = () => {
   const [isFilteringOverrides, setIsFilteringOverrides] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { featureId } = useParams();
   const navigate = useNavigate();
   const {
@@ -53,7 +56,7 @@ const FeatureDetail = () => {
     (f) => f.feature.id === featureId
   );
 
-  const { filteredItems: tenants, setFilter: setSearchTerm  } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
+  const { filteredItems: tenants, setFilter: setSearchTerm } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
   const filteredTenants = tenants.filter(
     (tenant) => !isFilteringOverrides || foundFeature?.tenantStates.find((t) => t.tenantId === tenant.id)?.override);
 
@@ -146,74 +149,96 @@ const FeatureDetail = () => {
   const { feature: selectedFlag, tenantStates } = foundFeature;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <Navbar backRoute="/features" />
-          <div className="flex gap-5 items-start mb-6">
-            <ToggleButton
-              size="xl"
-              action={async () =>
-                await updateFeatureState(
-                  selectedFlag.id,
-                  !selectedFlag.isEnabled
-                )
-              }
-              isEnabled={selectedFlag.isEnabled}
-            />
-            <div className="w-full">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {selectedFlag.name}
-                </h1>
-                <Code>{selectedFlag.id}</Code>
+    <>
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <Navbar backRoute="/features" />
+            <div className="flex gap-5 items-start mb-6">
+              <ToggleButton
+                size="xl"
+                action={() => setIsModalOpen(true)}
+                isEnabled={selectedFlag.isEnabled}
+              />
+              <div className="w-full">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    {selectedFlag.name}
+                  </h1>
+                  <Code>{selectedFlag.id}</Code>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <p>{selectedFlag.description}</p>
+                  <span>
+                    Last updated:{" "}
+                    {new Date(selectedFlag.updatedAt).toLocaleDateString()}{" "}
+                    {new Date(selectedFlag.updatedAt).toLocaleTimeString()}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between text-gray-600">
-                <p>{selectedFlag.description}</p>
-                <span>
-                  Last updated:{" "}
-                  {new Date(selectedFlag.updatedAt).toLocaleDateString()}{" "}
-                  {new Date(selectedFlag.updatedAt).toLocaleTimeString()}
-                </span>
-              </div>
+              <div className="flex items-center gap-2"></div>
             </div>
-            <div className="flex items-center gap-2"></div>
+
+            <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>
+              This feature is currently enabled for{" "}
+              {tenantStates.filter((x) => x.isEnabled).length} out of{" "}
+              {availableTenants.length} tenants
+            </Alert>
           </div>
 
-          <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>
-            This feature is currently enabled for{" "}
-            {tenantStates.filter((x) => x.isEnabled).length} out of{" "}
-            {availableTenants.length} tenants
-          </Alert>
-        </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Tenant Management</CardTitle>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tenant Management</CardTitle>
-
-            <div className="mt-2">
-              <SearchBar
-                onChange={setSearchTerm}
-                placeholder="Search Tenants..."
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="pl-2 pt-2">
-              <label>
-                <input
-                  className="mr-3"
-                  type="checkbox"
-                  onChange={(x) => setIsFilteringOverrides(x.target.checked)}
+              <div className="mt-2">
+                <SearchBar
+                  onChange={setSearchTerm}
+                  placeholder="Search Tenants..."
                 />
-                Show Only Overriden Tenants
-              </label>
-            </div>
-            <DynamicTable items={filteredTenants} columns={tableCols} />
-          </CardContent>
-        </Card>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="pl-2 pt-2">
+                <label>
+                  <input
+                    className="mr-3"
+                    type="checkbox"
+                    onChange={(x) => setIsFilteringOverrides(x.target.checked)}
+                  />
+                  Show Only Overriden Tenants
+                </label>
+              </div>
+              <DynamicTable items={filteredTenants} columns={tableCols} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <ModalHeader>
+          <h2 className="text-xl font-bold">{!selectedFlag.isEnabled ? "Enable" : "Disable"} Flag?</h2>
+        </ModalHeader>
+        <ModalBody>
+          <p>
+            Are you sure you want to {!selectedFlag.isEnabled ? 'enable' : 'disable'} this feature flag?
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={async () => {
+            await updateFeatureState(
+              selectedFlag.id,
+              !selectedFlag.isEnabled
+            );
+            setIsModalOpen(false);
+          }}
+            variant={!selectedFlag.isEnabled ? "primary" : 'warn'}
+          >{!selectedFlag.isEnabled ? 'Enable' : 'Disable'}</Button>
+          <Button
+            variant="secondary"
+            onClick={() => setIsModalOpen(false)}
+          >Cancel</Button>
+        </ModalFooter>
+      </Modal>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from "react";
+import useTailwindStyles from "../hooks/useStyling";
 
 export type Stylable = { className?: string };
 
@@ -9,8 +10,15 @@ const Card = ({
 }: React.PropsWithChildren<
   Stylable & Pick<React.HtmlHTMLAttributes<HTMLDivElement>, "onClick">
 >) => {
+
+  const styles = useTailwindStyles({
+    card: "bg-white shadow rounded-lg p-4",
+  });
+
+  const clickableStyles = styles.cardIf(!!props.onClick, 'shadow-sm cursor-pointer hover:shadow-md transition-shadow');
+
   return (
-    <div {...props} className={`bg-white shadow rounded-lg p-4 ${className}`}>
+    <div {...props} className={styles.cx(styles.card, clickableStyles, className)}>
       {children}
     </div>
   );
@@ -40,8 +48,9 @@ const CardContent = ({
 const CardDescription = ({
   children,
   className,
-}: React.PropsWithChildren<Stylable>) => {
-  return <p className={`text-sm text-gray-500 ${className}`}>{children}</p>;
+  ...props
+}: React.PropsWithChildren<Stylable & React.HtmlHTMLAttributes<HTMLParagraphElement>>) => {
+  return <p {...props} className={`text-sm text-gray-500 ${className}`}>{children}</p>;
 };
 
 export { Card, CardHeader, CardTitle, CardContent, CardDescription };
