@@ -179,6 +179,7 @@ const FeatureDetail = () => {
                   </span>
                 </div>
               </div>
+              <div className="flex items-center gap-2"></div>
             </div>
 
             <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>

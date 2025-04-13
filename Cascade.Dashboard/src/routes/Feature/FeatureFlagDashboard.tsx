@@ -55,19 +55,18 @@ const FeatureFlagDashboard = () => {
           <SearchBar
             placeholder={t('FEATURE_DASHBOARD.SEARCH_PLACEHOLDER')}
             onChange={(term) => setSearchTerm(term)}
-            />
+          />
         </div>
 
         <div className={styles.grid}>
           {flags?.map(({ feature: flag, tenantStates }) => (
             <Card
               key={flag.id}
-              className={styles.card}
               onClick={() => navigate(`/features/${flag.id}`)}
             >
               <CardHeader className={styles.cardHeader}>
                 <div className="flex justify-between items-start">
-                  <div className="flex-1">
+                  <div className="flex-1 overflow-hidden">
                     <CardTitle className={styles.cardTitle}>
                       {flag.name}{" "}
                       {!knownIds.some((id) => id === flag.id) && (
@@ -76,7 +75,7 @@ const FeatureFlagDashboard = () => {
                         </Tooltip>
                       )}
                     </CardTitle>
-                    <CardDescription>{flag.description}</CardDescription>
+                    <CardDescription title={flag.description} className="truncate">{flag.description}</CardDescription>
                   </div>
                   <ToggleButton
                     isReadOnly
@@ -101,11 +100,10 @@ const FeatureFlagDashboard = () => {
                     <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{
-                        width: `${
-                          (tenantStates.filter((ts) => ts.isEnabled).length /
-                            tenantStates.length) *
+                        width: `${(tenantStates.filter((ts) => ts.isEnabled).length /
+                          tenantStates.length) *
                           100
-                        }%`,
+                          }%`,
                       }}
                     />
                   </div>
@@ -153,7 +151,6 @@ const styles = {
   subheading: "text-gray-600",
   searchContainer: "mb-6",
   grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
-  card: "shadow-sm cursor-pointer hover:shadow-md transition-shadow",
   cardHeader: "pb-4",
   cardTitle: "text-lg font-semibold mb-1 flex items-center gap-2",
 };

@@ -62,7 +62,6 @@ const TenantDashboard = () => {
             return (
               <Card
                 key={tenant.id}
-                className="shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => navigate(`/tenants/${tenant.id}`)}
               >
                 <CardHeader className="pb-4">

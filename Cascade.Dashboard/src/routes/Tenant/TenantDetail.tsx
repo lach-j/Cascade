@@ -87,12 +87,19 @@ const TenantDetail = () => {
         Cell: ({ item }) => (
           <div>
             <h3 className="font-medium text-gray-900">{item.feature.name}</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-baseline gap-2 text-sm text-gray-500">
               <span>{item.feature.id}</span>
               <span className="capitalize">{item.feature.description}</span>
             </div>
           </div>
         ),
+        shrink: true,
+      },
+      {
+        Cell: ({ item }) => (
+          item.feature.description
+        ),
+        className: "text-gray-500 text-xs hidden md:table-cell",
       },
       {
         Cell: ({ item }) =>
