@@ -18,6 +18,7 @@ import Tooltip from "../../components/Tooltip";
 import useFiltering from "../../hooks/useFiltering";
 import ToggleButton from "../../components/ToggleButton";
 import SearchBar from "../../components/SearchBar";
+import { useTranslation } from "react-i18next";
 
 const FeatureFlagDashboard = () => {
   const navigate = useNavigate();
@@ -33,24 +34,26 @@ const FeatureFlagDashboard = () => {
     feature.feature.id,
   ]);
 
+  const { t } = useTranslation();
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.header}>
           <NavTabs initialActiveTab="tenants">
-            <NavTab route="/features">Features</NavTab>
-            <NavTab route="/tenants">Tenants</NavTab>
+            <NavTab route="/features">{t('FEATURE_DASHBOARD.TAB')}</NavTab>
+            <NavTab route="/tenants">{t('TENANT_DASHBOARD.TAB')}</NavTab>
           </NavTabs>
           <h1 className={styles.heading}>
-            Feature Flag Management
+            {t('FEATURE_DASHBOARD.TITLE')}
           </h1>
           <p className={styles.subheading}>
-            Manage feature flags across all tenants
+            {t('FEATURE_DASHBOARD.SUBTITLE')}
           </p>
         </div>
         <div className={styles.searchContainer}>
           <SearchBar
-            placeholder="Search features..."
+            placeholder={t('FEATURE_DASHBOARD.SEARCH_PLACEHOLDER')}
             onChange={(term) => setSearchTerm(term)}
           />
         </div>
@@ -67,7 +70,7 @@ const FeatureFlagDashboard = () => {
                     <CardTitle className={styles.cardTitle}>
                       {flag.name}{" "}
                       {!knownIds.some((id) => id === flag.id) && (
-                        <Tooltip text="This feature does not correspond to any ID configured in the application">
+                        <Tooltip text={t('FEATURE_DASHBOARD.UNMAPPED_TOOLTIP')}>
                           <LuTriangleAlert className="text-yellow-500" />
                         </Tooltip>
                       )}
@@ -86,11 +89,10 @@ const FeatureFlagDashboard = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 flex items-center gap-2">
                       <LuChartBar className="w-4 h-4" />
-                      Tenant Adoption
+                      {t('FEATURE_DASHBOARD.CARD.ADOPTION')}
                     </span>
                     <span className="font-medium">
-                      {tenantStates.filter((ts) => ts.isEnabled).length}/
-                      {tenantStates.length} tenants
+                      {t('FEATURE_DASHBOARD.CARD.ENABLED_COUNT', { enabledCount: tenantStates.filter((ts) => ts.isEnabled).length, totalCount: tenantStates.length })}
                     </span>
                   </div>
 
@@ -115,11 +117,10 @@ const FeatureFlagDashboard = () => {
             <div className="mb-4 flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  Unmapped Features
+                  {t('FEATURE_DASHBOARD.UNMAPPED_FEATURES.TITLE')}
                 </h2>
                 <p className="text-gray-600">
-                  Feature IDs used by your application that are not mapped to
-                  features in Cascade
+                  {t('FEATURE_DASHBOARD.UNMAPPED_FEATURES.DESCRIPTION')}
                 </p>
               </div>
               <button
@@ -127,7 +128,7 @@ const FeatureFlagDashboard = () => {
                 className="flex items-center gap-2 px-2 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
               >
                 <LuPlus className="w-5 h-5" />
-                Create All Missing
+                {t('FEATURE_DASHBOARD.UNMAPPED_FEATURES.CREATE_ALL')}
               </button>
             </div>
             <div className="flex gap-5 flex-wrap">

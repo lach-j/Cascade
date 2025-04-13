@@ -21,7 +21,7 @@ export const Modal = ({ children, isOpen = false, onClose }: React.PropsWithChil
         }
     });
 
-    const hiddenModalStyles = styles.modalIf(!isOpen, 'hidden'); 
+    const hiddenModalStyles = styles.modalIf(!isOpen, 'hidden');
 
     return (
         <div className={styles.cx(styles.modal, hiddenModalStyles)}>

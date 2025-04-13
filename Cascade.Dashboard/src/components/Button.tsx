@@ -7,7 +7,7 @@ type ButtonProps = {
 }
 
 
-const Button = ({children, variant = 'primary', ...props}: React.PropsWithChildren<ButtonProps & React.HtmlHTMLAttributes<HTMLButtonElement>>) => {
+const Button = ({ children, variant = 'primary', ...props }: React.PropsWithChildren<ButtonProps & React.HtmlHTMLAttributes<HTMLButtonElement>>) => {
 
     const styles = useTailwindStyles({
         button: "px-4 py-2 rounded-lg cursor-pointer",
@@ -16,7 +16,7 @@ const Button = ({children, variant = 'primary', ...props}: React.PropsWithChildr
             primary: {
                 button: "bg-green-500 text-white hover:bg-green-600",
             },
-            secondary: {            
+            secondary: {
                 button: "bg-gray-500 text-white hover:bg-gray-600",
             },
             warn: {

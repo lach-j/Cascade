@@ -24,6 +24,7 @@ import Navbar from "../../components/Navbar";
 import ExternalLink from "../../components/ExternalLink";
 import SearchBar from "../../components/SearchBar";
 import useFiltering from "../../hooks/useFiltering";
+import { useTranslation } from "react-i18next";
 
 const TenantDetail = () => {
   const { tenantId } = useParams();
@@ -34,6 +35,8 @@ const TenantDetail = () => {
     updateFeatureState,
     toggleOverride,
   } = useFeatureContext();
+
+  const { t } = useTranslation();
 
   const tenant = availableTenants.find((t) => t.id === tenantId);
 
@@ -86,6 +89,7 @@ const TenantDetail = () => {
             <h3 className="font-medium text-gray-900">{item.feature.name}</h3>
             <div className="flex items-baseline gap-2 text-sm text-gray-500">
               <span>{item.feature.id}</span>
+              <span className="capitalize">{item.feature.description}</span>
             </div>
           </div>
         ),
@@ -101,7 +105,7 @@ const TenantDetail = () => {
         Cell: ({ item }) =>
           item.override && (
             <div className="flex items-center gap-1 text-gray-500">
-              <div className="text-sm text-gray-500">Overriden</div>
+              <div className="text-sm text-gray-500">{t('TENANT_DETAIL.TABLE.OVERRIDEN')}</div>
               <Tooltip text="When a feature is overidden it will NOT change when the global feature toggle is changed. To ensure that this tenant receives feature flag updates, remove this status.">
                 <LuInfo className="w-4 h-4 text-gray-500" />
               </Tooltip>
@@ -122,7 +126,7 @@ const TenantDetail = () => {
                       navigate(`/features/${item.feature.id}`);
                     }}
                   >
-                    Feature View
+                    {t('TENANT_DETAIL.TABLE.MENU.FEATURE_VIEW')}
                   </button>
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -130,7 +134,7 @@ const TenantDetail = () => {
                       toggleOverride(tenant?.id ?? "", item.feature.id);
                     }}
                   >
-                    {item.override ? "Remove Override" : "Override"}
+                    {item.override ? t('TENANT_DETAIL.TABLE.MENU.REMOVE_OVERRIDE') : t('TENANT_DETAIL.TABLE.MENU.OVERRIDE')}
                   </button>
                 </>
               ),
@@ -140,7 +144,7 @@ const TenantDetail = () => {
         shrink: true,
       },
     ],
-    [navigate, tenant?.id, toggleOverride, updateFeatureState]
+    [navigate, tenant?.id, toggleOverride, updateFeatureState, t]
   );
 
   const featureStates = availableFeatures.map(({ tenantStates, feature }) => {
@@ -154,7 +158,7 @@ const TenantDetail = () => {
 
   const { setFilter: setSearchTerm, filteredItems: filteredFeatures } = useFiltering(featureStates, (item) => [item.feature.name, item.feature.id]);
 
-  if (!tenant) return <p>Loading...</p>;
+  if (!tenant) return <p>{t('LOADING')}</p>;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -176,19 +180,17 @@ const TenantDetail = () => {
           </div>
 
           <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>
-            This tenant currently has{" "}
-            {featureStates.filter((x) => x.isEnabled).length} out of{" "}
-            {availableFeatures.length} features enabled
+            {t('TENANT_DETAIL.ENABLED_COUNT', { enabledCount: featureStates.filter((x) => x.isEnabled).length, totalCount: availableFeatures.length })}
           </Alert>
         </div>
 
         <div className="mb-6">
-          <SearchBar placeholder="Search features" onChange={term => setSearchTerm(term)} />
+          <SearchBar placeholder={t("TENANT_DETAIL.SEARCH_PLACEHOLDER")} onChange={term => setSearchTerm(term)} />
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Feature Management</CardTitle>
+            <CardTitle>{t("TENANT_DETAIL.FEATURE_MANAGEMENT.TITLE")}</CardTitle>
           </CardHeader>
           <CardContent>
             <DynamicTable items={filteredFeatures} columns={tableCols} />

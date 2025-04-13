@@ -61,8 +61,8 @@ const ToggleButton = ({
   const hoverClass = isReadOnly
     ? ""
     : isEnabled
-    ? "hover:bg-green-200"
-    : "hover:bg-gray-200";
+      ? "hover:bg-green-200"
+      : "hover:bg-gray-200";
 
   const stateStyles = isEnabled
     ? styles.withState("enabled")

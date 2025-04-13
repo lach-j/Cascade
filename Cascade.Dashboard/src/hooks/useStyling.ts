@@ -9,10 +9,10 @@ type WithVariantMethods<
   Variants extends Record<string, StylesMap>,
   Styles extends StylesObject
 > = {
-  [K in keyof Variants as `with${Capitalize<string & K>}`]: (
-    option: keyof Variants[K]
-  ) => TailwindStylesReturn<Styles, Variants>;
-};
+    [K in keyof Variants as `with${Capitalize<string & K>}`]: (
+      option: keyof Variants[K]
+    ) => TailwindStylesReturn<Styles, Variants>;
+  };
 
 // Helper to capitalize the first letter in a type
 type Capitalize<S extends string> = S extends `${infer F}${infer R}`
@@ -28,17 +28,17 @@ export type TailwindStylesReturn<
 > = Styles & {
   [K in keyof Styles]: Styles[K];
 } & {
-  [K in keyof Styles as `${string & K}If`]: (
-    condition: Condition,
-    additionalClasses: string
-  ) => string;
-} & {
-  [K in keyof Styles as `${string & K}ToggleClass`]: (
-    condition: Condition,
-    trueClass: string,
-    falseClass?: string
-  ) => string;
-} & WithVariantMethods<Variants, Styles> & {
+    [K in keyof Styles as `${string & K}If`]: (
+      condition: Condition,
+      additionalClasses: string
+    ) => string;
+  } & {
+    [K in keyof Styles as `${string & K}ToggleClass`]: (
+      condition: Condition,
+      trueClass: string,
+      falseClass?: string
+    ) => string;
+  } & WithVariantMethods<Variants, Styles> & {
     cx: (...classes: (string | Condition)[]) => string;
   };
 
@@ -47,6 +47,7 @@ export type TailwindStylesReturn<
  */
 export function useTailwindStyles<
   Styles extends StylesObject,
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   Variants extends Record<string, StylesMap> = {}
 >(
   baseStyles: Styles,

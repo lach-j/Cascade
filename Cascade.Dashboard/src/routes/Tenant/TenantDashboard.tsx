@@ -12,32 +12,35 @@ import NavTabs, { NavTab } from "../../components/Tabs";
 import OrganisationIcon from "../../components/OrganisationIcon";
 import useFiltering from "../../hooks/useFiltering";
 import SearchBar from "../../components/SearchBar";
+import { useTranslation } from "react-i18next";
 
 const TenantDashboard = () => {
   const navigate = useNavigate();
 
   const { availableTenants, availableFeatures } = useFeatureContext();
-  const { filteredItems: tenants, setFilter: setSearchTerm  } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
+  const { filteredItems: tenants, setFilter: setSearchTerm } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
+
+  const { t } = useTranslation();
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <NavTabs initialActiveTab="tenants">
-            <NavTab route="/features">Features</NavTab>
-            <NavTab route="/tenants">Tenants</NavTab>
+            <NavTab route="/features">{t('FEATURE_DASHBOARD.TAB')}</NavTab>
+            <NavTab route="/tenants">{t('TENANT_DASHBOARD.TAB')}</NavTab>
           </NavTabs>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Tenant Management
+            {t('TENANT_DASHBOARD.TITLE')}
           </h1>
           <p className="text-gray-600">
-            Manage and monitor all tenant configurations
+            {t('TENANT_DASHBOARD.SUBTITLE')}
           </p>
         </div>
 
         <div className="mb-6">
           <SearchBar
-            placeholder="Search tenants..."
+            placeholder={t('TENANT_DASHBOARD.SEARCH_PLACEHOLDER')}
             onChange={(term) => setSearchTerm(term)}
           />
         </div>
@@ -67,7 +70,7 @@ const TenantDashboard = () => {
                       <CardTitle className="text-lg font-semibold mb-1">
                         {tenant.name}
                       </CardTitle>
-                      <CardDescription>ID: {tenant.id}</CardDescription>
+                      <CardDescription>{t('TENANT_DASHBOARD.CARD.ID', { tenantId: tenant.id })}</CardDescription>
                     </div>
                     <div className="p-2 rounded-full bg-gray-100">
                       <OrganisationIcon text={tenant.name} />
@@ -79,11 +82,13 @@ const TenantDashboard = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600 flex items-center gap-2">
                         <LuChartBar className="w-4 h-4" />
-                        Feature Usage
+                        {t('TENANT_DASHBOARD.CARD.USAGE')}
                       </span>
                       <span className="font-medium">
-                        {enabledFeatures.length}/{availableFeatures.length}{" "}
-                        features
+                        {t('TENANT_DASHBOARD.CARD.ENABLED_COUNT', {
+                          enabledCount: enabledFeatures.length,
+                          totalCount: availableFeatures.length,
+                        })}
                       </span>
                     </div>
 
@@ -91,19 +96,17 @@ const TenantDashboard = () => {
                       <div
                         className="bg-blue-600 h-2 rounded-full"
                         style={{
-                          width: `${
-                            (enabledFeatures.length /
-                              availableFeatures.length) *
+                          width: `${(enabledFeatures.length /
+                            availableFeatures.length) *
                             100
-                          }%`,
+                            }%`,
                         }}
                       />
                     </div>
 
                     {overriddenFeatures.length > 0 && (
                       <div className="text-sm text-amber-600">
-                        {overriddenFeatures.length} overridden feature
-                        {overriddenFeatures.length === 1 ? "" : "s"}
+                        {t('TENANT_DASHBOARD.CARD.OVERRIDDEN_COUNT', { count: overriddenFeatures.length })}
                       </div>
                     )}
                   </div>

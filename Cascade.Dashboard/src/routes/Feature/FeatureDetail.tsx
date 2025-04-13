@@ -17,7 +17,8 @@ import Code from "../../components/Code";
 import DynamicTable, { ColumnDefinition } from "../../components/DynamicTable";
 import ToggleButton from "../../components/ToggleButton";
 import useFiltering from "../../hooks/useFiltering";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from "../../components/Modal";
+import { useTranslation } from "react-i18next";
+import { Modal, ModalBody, ModalFooter, ModalHeader } from "../../components/Modal";
 import Button from "../../components/Button";
 
 export type FeatureFlag = {
@@ -55,6 +56,8 @@ const FeatureDetail = () => {
   const foundFeature = availableFeatures.find(
     (f) => f.feature.id === featureId
   );
+
+  const { t } = useTranslation();
 
   const { filteredItems: tenants, setFilter: setSearchTerm } = useFiltering(availableTenants, (tenant) => [tenant.name, tenant.id]);
   const filteredTenants = tenants.filter(
@@ -98,8 +101,8 @@ const FeatureDetail = () => {
           foundFeature?.tenantStates.find((t) => t.tenantId === item.id)
             ?.override && (
             <div className="flex items-center gap-1 text-gray-500">
-              <div className="text-sm text-gray-500">Overriden</div>
-              <Tooltip text="When a feature is overidden it will NOT change when the global feature toggle is changed. To ensure that this tenant receives feature flag updates, remove this status.">
+              <div className="text-sm text-gray-500">{t('FEATURE_DETAIL.TENANT_MANAGEMENT.OVERRIDDEN')}</div>
+              <Tooltip text={t('FEATURE_DETAIL.TENANT_MANAGEMENT.OVERRIDDEN_TOOLTIP')}>
                 <LuInfo className="w-4 h-4 text-gray-500" />
               </Tooltip>
             </div>
@@ -119,7 +122,7 @@ const FeatureDetail = () => {
                       navigate(`/tenants/${item.id}`);
                     }}
                   >
-                    Tenant View
+                    {t("FEATURE_DETAIL.MENU.TENANT_VIEW")}
                   </button>
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -130,8 +133,8 @@ const FeatureDetail = () => {
                     {foundFeature?.tenantStates.find(
                       (t) => t.tenantId === item.id
                     )?.override
-                      ? "Remove Override"
-                      : "Override"}
+                      ? t("FEATURE_DETAIL.MENU.REMOVE_OVERRIDE")
+                      : t("FEATURE_DETAIL.MENU.OVERRIDE")}
                   </button>
                 </>
               ),
@@ -141,12 +144,14 @@ const FeatureDetail = () => {
         shrink: true,
       },
     ],
-    [featureId, foundFeature, navigate, toggleOverride, updateFeatureState]
+    [featureId, foundFeature?.feature.id, foundFeature?.tenantStates, navigate, t, toggleOverride, updateFeatureState]
   );
 
-  if (!foundFeature) return <p>Loading...</p>;
+  if (!foundFeature) return <p>{t('LOADING')}</p>;
 
   const { feature: selectedFlag, tenantStates } = foundFeature;
+
+  const updatedDateTime = new Date(selectedFlag.updatedAt).toLocaleDateString() + " " + new Date(selectedFlag.updatedAt).toLocaleTimeString();
 
   return (
     <>
@@ -170,9 +175,7 @@ const FeatureDetail = () => {
                 <div className="flex justify-between text-gray-600">
                   <p>{selectedFlag.description}</p>
                   <span>
-                    Last updated:{" "}
-                    {new Date(selectedFlag.updatedAt).toLocaleDateString()}{" "}
-                    {new Date(selectedFlag.updatedAt).toLocaleTimeString()}
+                    {t("FEATURE_DETAIL.LAST_UPDATED", { updatedDateTime })}
                   </span>
                 </div>
               </div>
@@ -180,20 +183,18 @@ const FeatureDetail = () => {
             </div>
 
             <Alert className="mb-6" icon={<LuCircleAlert className="h-4 w-4" />}>
-              This feature is currently enabled for{" "}
-              {tenantStates.filter((x) => x.isEnabled).length} out of{" "}
-              {availableTenants.length} tenants
+              {t("FEATURE_DETAIL.ENABLED_COUNT", { enabledCount: tenantStates.filter((ts) => ts.isEnabled).length, totalCount: tenantStates.length })}
             </Alert>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Tenant Management</CardTitle>
+              <CardTitle>{t('FEATURE_DETAIL.TENANT_MANAGEMENT.TITLE')}</CardTitle>
 
               <div className="mt-2">
                 <SearchBar
                   onChange={setSearchTerm}
-                  placeholder="Search Tenants..."
+                  placeholder={t('FEATURE_DETAIL.TENANT_MANAGEMENT.SEARCH_PLACEHOLDER')}
                 />
               </div>
             </CardHeader>
@@ -205,7 +206,7 @@ const FeatureDetail = () => {
                     type="checkbox"
                     onChange={(x) => setIsFilteringOverrides(x.target.checked)}
                   />
-                  Show Only Overriden Tenants
+                  {t('FEATURE_DETAIL.TENANT_MANAGEMENT.FILTER_OVERRIDDEN')}
                 </label>
               </div>
               <DynamicTable items={filteredTenants} columns={tableCols} />
@@ -215,11 +216,11 @@ const FeatureDetail = () => {
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ModalHeader>
-          <h2 className="text-xl font-bold">{!selectedFlag.isEnabled ? "Enable" : "Disable"} Flag?</h2>
+          <h2 className="text-xl font-bold">{t(`FEATURE_DETAIL.CONFIRMATION.TITLE.${!selectedFlag.isEnabled ? "ENABLE" : "DISABLE"}`)}</h2>
         </ModalHeader>
         <ModalBody>
           <p>
-            Are you sure you want to {!selectedFlag.isEnabled ? 'enable' : 'disable'} this feature flag?
+            {t(`FEATURE_DETAIL.CONFIRMATION.DESCRIPTION.${!selectedFlag.isEnabled ? "ENABLE" : "DISABLE"}`)}
           </p>
         </ModalBody>
         <ModalFooter>
@@ -231,11 +232,11 @@ const FeatureDetail = () => {
             setIsModalOpen(false);
           }}
             variant={!selectedFlag.isEnabled ? "primary" : 'warn'}
-          >{!selectedFlag.isEnabled ? 'Enable' : 'Disable'}</Button>
+          >{t(`FEATURE_DETAIL.CONFIRMATION.CONFIRM.${!selectedFlag.isEnabled ? "ENABLE" : "DISABLE"}`)}</Button>
           <Button
             variant="secondary"
             onClick={() => setIsModalOpen(false)}
-          >Cancel</Button>
+          >{t('FEATURE_DETAIL.CONFIRMATION.CANCEL')}</Button>
         </ModalFooter>
       </Modal>
     </>

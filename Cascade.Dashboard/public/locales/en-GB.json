@@ -1,0 +1,78 @@
+{
+    "LOADING": "Loading...",
+    "FEATURE_DETAIL": {
+        "MENU": {
+            "TENANT_VIEW": "Tenant View",
+            "REMOVE_OVERRIDE": "Remove Override",
+            "OVERRIDE": "Override"
+        },
+        "LAST_UPDATED": "Last Updated: {{updatedDateTime}}",
+        "ENABLED_COUNT": "This feature is currently enabled for {{enabledCount}} out of {{totalCount}} tenants.",
+        "TENANT_MANAGEMENT": {
+            "TITLE": "Tenant Management",
+            "SEARCH_PLACEHOLDER": "Search Tenants...",
+            "FILTER_OVERRIDDEN": "Show Only Overridden Tenants",
+            "OVERRIDDEN": "Overridden",
+            "OVERRIDDEN_TOOLTIP": "When a feature is overidden it will NOT change when the global feature toggle is changed. To ensure that this tenant receives feature flag updates, remove this status."
+        },
+        "CONFIRMATION": {
+            "TITLE": {
+                "ENABLE": "Enable Feature",
+                "DISABLE": "Disable Feature"
+            },
+            "DESCRIPTION": {
+                "ENABLE": "Are you sure you want to enable this feature for all tenants?",
+                "DISABLE": "Are you sure you want to disable this feature for all tenants?"
+            },
+            "CONFIRM": {
+                "ENABLE": "Enable",
+                "DISABLE": "Disable"
+            },
+            "CANCEL": "Cancel"
+        }
+    },
+    "FEATURE_DASHBOARD": {
+        "TAB": "Features",
+        "TITLE": "Feature Flag Management",
+        "SUBTITLE": "Manage feature flags across all tenants",
+        "SEARCH_PLACEHOLDER": "Search Features...",
+        "UNMAPPED_TOOLTIP": "This feature does not correspond to any ID configured in the application",
+        "CARD": {
+            "ADOPTION": "Tenant Adoption",
+            "ENABLED_COUNT": "{{enabledCount}}/{{totalCount}} tenants"
+        },
+        "UNMAPPED_FEATURES": {
+            "TITLE": "Unmapped Features",
+            "DESCRIPTION": "Feature IDs used by your application that are not mapped to features in Cascade",
+            "CREATE_ALL": "Create All"
+        }
+    },
+    "TENANT_DASHBOARD": {
+        "TAB": "Tenants",
+        "TITLE": "Tenant Management",
+        "SUBTITLE": "Manage and monitor all tenant configurations",
+        "SEARCH_PLACEHOLDER": "Search Tenants...",
+        "CARD": {
+            "ID": "ID: {{tenantId}}",
+            "USAGE": "Feature Usage",
+            "ENABLED_COUNT": "{{enabledCount}}/{{totalCount}} features",
+            "OVERRIDDEN_COUNT_one": "{{count}} feature overridden",
+            "OVERRIDDEN_COUNT_other": "{{count}} features overridden"
+        }
+    },
+    "TENANT_DETAIL": {
+        "TABLE": {
+            "OVERRIDEN": "Overriden",
+            "MENU": {
+                "FEATURE_VIEW": "Feature View",
+                "REMOVE_OVERRIDE": "Remove Override",
+                "OVERRIDE": "Override"
+            }
+        },
+        "SEARCH_PLACEHOLDER": "Search Features...",
+        "ENABLED_COUNT": "This tenant currently has {{enabledCount}} out of {{totalCount}} features enabled.",
+        "FEATURE_MANAGEMENT": {
+            "TITLE": "Feature Management"
+        }
+    }
+}
