@@ -4,22 +4,15 @@ type StylesObject = Record<string, string>;
 type StylesMap = Record<string, StylesObject>;
 type Condition = boolean | undefined | null;
 
-// Base style methods that are added to every key
-type BaseStyleExtensions<K extends string> = {
-  [P in `${K}If` | `${K}ToggleClass`]: P extends `${K}If`
-    ? (condition: Condition, additionalClasses: string) => string
-    : (condition: Condition, trueClass: string, falseClass?: string) => string;
-};
-
 // Generic utility to create variant method names (withSize, withColor, etc.)
 type WithVariantMethods<
   Variants extends Record<string, StylesMap>,
   Styles extends StylesObject
 > = {
-  [K in keyof Variants as `with${Capitalize<string & K>}`]: (
-    option: keyof Variants[K]
-  ) => TailwindStylesReturn<Styles, Variants>;
-};
+    [K in keyof Variants as `with${Capitalize<string & K>}`]: (
+      option: keyof Variants[K]
+    ) => TailwindStylesReturn<Styles, Variants>;
+  };
 
 // Helper to capitalize the first letter in a type
 type Capitalize<S extends string> = S extends `${infer F}${infer R}`
@@ -32,11 +25,20 @@ type Capitalize<S extends string> = S extends `${infer F}${infer R}`
 export type TailwindStylesReturn<
   Styles extends StylesObject,
   Variants extends Record<string, StylesMap>
-> = Styles & { [K in keyof Styles]: Styles[K] } & {
-  [K in keyof Styles as string & K]: BaseStyleExtensions<
-    string & K
-  >[keyof BaseStyleExtensions<string & K>];
-} & WithVariantMethods<Variants, Styles> & {
+> = Styles & {
+  [K in keyof Styles]: Styles[K];
+} & {
+    [K in keyof Styles as `${string & K}If`]: (
+      condition: Condition,
+      additionalClasses: string
+    ) => string;
+  } & {
+    [K in keyof Styles as `${string & K}ToggleClass`]: (
+      condition: Condition,
+      trueClass: string,
+      falseClass?: string
+    ) => string;
+  } & WithVariantMethods<Variants, Styles> & {
     cx: (...classes: (string | Condition)[]) => string;
   };
 
@@ -45,7 +47,8 @@ export type TailwindStylesReturn<
  */
 export function useTailwindStyles<
   Styles extends StylesObject,
-  Variants extends Record<string, StylesMap> = Record<string, never>
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  Variants extends Record<string, StylesMap> = {}
 >(
   baseStyles: Styles,
   variants?: Variants

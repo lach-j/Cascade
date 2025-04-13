@@ -5,7 +5,7 @@ import useStyling from "../hooks/useStyling";
 type Size = "sm" | "md" | "lg" | "xl";
 
 type ToggleButtonProps = {
-  action?: () => Promise<void>;
+  action?: () => Promise<void> | void;
   isEnabled?: boolean;
   isReadOnly?: boolean;
   size?: Size;
@@ -61,8 +61,8 @@ const ToggleButton = ({
   const hoverClass = isReadOnly
     ? ""
     : isEnabled
-    ? "hover:bg-green-200"
-    : "hover:bg-gray-200";
+      ? "hover:bg-green-200"
+      : "hover:bg-gray-200";
 
   const stateStyles = isEnabled
     ? styles.withState("enabled")

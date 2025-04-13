@@ -7,6 +7,8 @@ import TenantDetail from "./routes/Tenant/TenantDetail.tsx";
 import FeatureProviderLayout from "./routes/layouts/FeatureProviderLayout.tsx";
 import TenantDashboard from "./routes/Tenant/TenantDashboard.tsx";
 
+import './i18n.ts';
+
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter basename="/Cascade">
     <Routes>
